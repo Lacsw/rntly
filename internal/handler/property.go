@@ -3,40 +3,35 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/Lacsw/rntly/internal/model"
-	"github.com/Lacsw/rntly/internal/store"
+	"github.com/Lacsw/rntly/internal/response"
+	"github.com/Lacsw/rntly/internal/service"
 )
 
 type PropertyHandler struct {
-	store *store.PropertyStore
+	service *service.PropertyService
 }
 
-func NewPropertyHandler(s *store.PropertyStore) *PropertyHandler {
-	return &PropertyHandler{store: s}
+func NewPropertyHandler(s *service.PropertyService) *PropertyHandler {
+	return &PropertyHandler{service: s}
 }
 
 func (h *PropertyHandler) List(w http.ResponseWriter, r *http.Request) {
-	properties := h.store.GetAll()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(properties)
+	properties := h.service.List()
+	response.JSON(w, http.StatusOK, properties)
 }
 
 func (h *PropertyHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	property, err := h.store.GetByID(id)
-	if errors.Is(err, store.ErrNotFound) {
-		http.Error(w, "property not found", http.StatusNotFound)
+	property, err := h.service.GetByID(id)
+	if errors.Is(err, service.ErrPropertyNotFound) {
+		response.Error(w, http.StatusNotFound, "property not found")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(property)
+	response.JSON(w, http.StatusOK, property)
 }
 
 func (h *PropertyHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -48,36 +43,21 @@ func (h *PropertyHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		response.Error(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
-	property := model.Property{
-		ID:         generateID(),
-		Address:    input.Address,
-		Type:       input.Type,
-		Bedrooms:   input.Bedrooms,
-		RentAmount: input.RentAmount,
-		Status:     "vacant",
-		CreatedAt:  time.Now().UTC(),
-		UpdatedAt:  time.Now().UTC(),
+	property, err := h.service.Create(input.Address, input.Type, input.Bedrooms, input.RentAmount)
+	if errors.Is(err, service.ErrInvalidInput) {
+		response.Error(w, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	created := h.store.Create(property)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(created)
+	response.JSON(w, http.StatusCreated, property)
 }
 
 func (h *PropertyHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-
-	existing, err := h.store.GetByID(id)
-	if errors.Is(err, store.ErrNotFound) {
-		http.Error(w, "property not found", http.StatusNotFound)
-		return
-	}
 
 	var input struct {
 		Address    string  `json:"address"`
@@ -88,35 +68,31 @@ func (h *PropertyHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		response.Error(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
-	existing.Address = input.Address
-	existing.Type = input.Type
-	existing.Bedrooms = input.Bedrooms
-	existing.RentAmount = input.RentAmount
-	existing.Status = input.Status
-	existing.UpdatedAt = time.Now().UTC()
+	property, err := h.service.Update(id, input.Address, input.Type, input.Bedrooms, input.RentAmount, input.Status)
+	if errors.Is(err, service.ErrPropertyNotFound) {
+		response.Error(w, http.StatusNotFound, "property not found")
+		return
+	}
+	if errors.Is(err, service.ErrInvalidInput) {
+		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	updated, _ := h.store.Update(id, existing)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(updated)
+	response.JSON(w, http.StatusOK, property)
 }
 
 func (h *PropertyHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	err := h.store.Delete(id)
-	if errors.Is(err, store.ErrNotFound) {
-		http.Error(w, "property not found", http.StatusNotFound)
+	err := h.service.Delete(id)
+	if errors.Is(err, service.ErrPropertyNotFound) {
+		response.Error(w, http.StatusNotFound, "property not found")
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func generateID() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano())
+	response.NoContent(w)
 }

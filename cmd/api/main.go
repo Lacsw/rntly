@@ -5,15 +5,15 @@ import (
 	"net/http"
 
 	"github.com/Lacsw/rntly/internal/handler"
+	"github.com/Lacsw/rntly/internal/service"
 	"github.com/Lacsw/rntly/internal/store"
 )
 
 func main() {
-	// Initialize store
+	// Initialize layers: store → service → handler
 	propertyStore := store.NewPropertyStore()
-
-	// Initialize handlers
-	propertyHandler := handler.NewPropertyHandler(propertyStore)
+	propertyService := service.NewPropertyService(propertyStore)
+	propertyHandler := handler.NewPropertyHandler(propertyService)
 
 	// Setup router
 	mux := http.NewServeMux()
