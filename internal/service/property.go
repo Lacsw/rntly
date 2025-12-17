@@ -44,6 +44,7 @@ func (s *PropertyService) Create(address, propertyType string, bedrooms int, ren
 		Address:    address,
 		Type:       propertyType,
 		Bedrooms:   bedrooms,
+		Area:       nil,
 		RentAmount: rentAmount,
 		Status:     "vacant",
 		CreatedAt:  time.Now().UTC(),
