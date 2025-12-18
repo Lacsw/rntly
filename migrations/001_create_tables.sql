@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS properties (
+    id VARCHAR(64) PRIMARY KEY,
+    address VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    bedrooms INTEGER NOT NULL DEFAULT 0,
+    rent_amount DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'vacant',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS tenants (
+    id VARCHAR(64) PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
