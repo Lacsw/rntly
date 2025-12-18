@@ -10,10 +10,17 @@ import (
 )
 
 func main() {
-	// Initialize layers: store → service → handler
+	// Initialize stores
 	propertyStore := store.NewPropertyStore()
+	tenantStore := store.NewTenantStore()
+
+	// Initialize services
 	propertyService := service.NewPropertyService(propertyStore)
+	tenantService := service.NewTenantService(tenantStore)
+
+	// Initialize handlers
 	propertyHandler := handler.NewPropertyHandler(propertyService)
+	tenantHandler := handler.NewTenantHandler(tenantService)
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -27,6 +34,13 @@ func main() {
 	mux.HandleFunc("POST /properties", propertyHandler.Create)
 	mux.HandleFunc("PUT /properties/{id}", propertyHandler.Update)
 	mux.HandleFunc("DELETE /properties/{id}", propertyHandler.Delete)
+
+	// Tenants
+	mux.HandleFunc("GET /tenants", tenantHandler.List)
+	mux.HandleFunc("GET /tenants/{id}", tenantHandler.Get)
+	mux.HandleFunc("POST /tenants", tenantHandler.Create)
+	mux.HandleFunc("PUT /tenants/{id}", tenantHandler.Update)
+	mux.HandleFunc("DELETE /tenants/{id}", tenantHandler.Delete)
 
 	port := ":8080"
 	log.Printf("🏠 rntly API starting on http://localhost%s", port)
