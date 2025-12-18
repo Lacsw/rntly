@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -22,19 +23,19 @@ func NewPropertyService(s *store.PropertyStore) *PropertyService {
 	return &PropertyService{store: s}
 }
 
-func (s *PropertyService) List() []model.Property {
-	return s.store.GetAll()
+func (s *PropertyService) List(ctx context.Context) ([]model.Property, error) {
+	return s.store.GetAll(ctx)
 }
 
-func (s *PropertyService) GetByID(id string) (model.Property, error) {
-	property, err := s.store.GetByID(id)
+func (s *PropertyService) GetByID(ctx context.Context, id string) (model.Property, error) {
+	property, err := s.store.GetByID(ctx, id)
 	if errors.Is(err, store.ErrNotFound) {
 		return model.Property{}, ErrPropertyNotFound
 	}
-	return property, nil
+	return property, err
 }
 
-func (s *PropertyService) Create(address, propertyType string, bedrooms int, rentAmount float64) (model.Property, error) {
+func (s *PropertyService) Create(ctx context.Context, address, propertyType string, bedrooms int, rentAmount float64) (model.Property, error) {
 	if err := s.validateInput(address, propertyType, bedrooms, rentAmount); err != nil {
 		return model.Property{}, err
 	}
@@ -44,20 +45,22 @@ func (s *PropertyService) Create(address, propertyType string, bedrooms int, ren
 		Address:    address,
 		Type:       propertyType,
 		Bedrooms:   bedrooms,
-		Area:       nil,
 		RentAmount: rentAmount,
 		Status:     "vacant",
 		CreatedAt:  time.Now().UTC(),
 		UpdatedAt:  time.Now().UTC(),
 	}
 
-	return s.store.Create(property), nil
+	return s.store.Create(ctx, property)
 }
 
-func (s *PropertyService) Update(id, address, propertyType string, bedrooms int, rentAmount float64, status string) (model.Property, error) {
-	existing, err := s.store.GetByID(id)
+func (s *PropertyService) Update(ctx context.Context, id, address, propertyType string, bedrooms int, rentAmount float64, status string) (model.Property, error) {
+	existing, err := s.store.GetByID(ctx, id)
 	if errors.Is(err, store.ErrNotFound) {
 		return model.Property{}, ErrPropertyNotFound
+	}
+	if err != nil {
+		return model.Property{}, err
 	}
 
 	if err := s.validateInput(address, propertyType, bedrooms, rentAmount); err != nil {
@@ -75,16 +78,15 @@ func (s *PropertyService) Update(id, address, propertyType string, bedrooms int,
 	existing.Status = status
 	existing.UpdatedAt = time.Now().UTC()
 
-	updated, _ := s.store.Update(id, existing)
-	return updated, nil
+	return s.store.Update(ctx, existing)
 }
 
-func (s *PropertyService) Delete(id string) error {
-	err := s.store.Delete(id)
+func (s *PropertyService) Delete(ctx context.Context, id string) error {
+	err := s.store.Delete(ctx, id)
 	if errors.Is(err, store.ErrNotFound) {
 		return ErrPropertyNotFound
 	}
-	return nil
+	return err
 }
 
 func (s *PropertyService) validateInput(address, propertyType string, bedrooms int, rentAmount float64) error {

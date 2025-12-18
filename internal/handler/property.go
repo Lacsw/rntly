@@ -18,16 +18,25 @@ func NewPropertyHandler(s *service.PropertyService) *PropertyHandler {
 }
 
 func (h *PropertyHandler) List(w http.ResponseWriter, r *http.Request) {
-	properties := h.service.List()
+	properties, err := h.service.List(r.Context())
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to fetch properties")
+		return
+	}
+
 	response.JSON(w, http.StatusOK, properties)
 }
 
 func (h *PropertyHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	property, err := h.service.GetByID(id)
+	property, err := h.service.GetByID(r.Context(), id)
 	if errors.Is(err, service.ErrPropertyNotFound) {
 		response.Error(w, http.StatusNotFound, "property not found")
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to fetch property")
 		return
 	}
 
@@ -47,9 +56,13 @@ func (h *PropertyHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	property, err := h.service.Create(input.Address, input.Type, input.Bedrooms, input.RentAmount)
+	property, err := h.service.Create(r.Context(), input.Address, input.Type, input.Bedrooms, input.RentAmount)
 	if errors.Is(err, service.ErrInvalidInput) {
 		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to create property")
 		return
 	}
 
@@ -72,13 +85,17 @@ func (h *PropertyHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	property, err := h.service.Update(id, input.Address, input.Type, input.Bedrooms, input.RentAmount, input.Status)
+	property, err := h.service.Update(r.Context(), id, input.Address, input.Type, input.Bedrooms, input.RentAmount, input.Status)
 	if errors.Is(err, service.ErrPropertyNotFound) {
 		response.Error(w, http.StatusNotFound, "property not found")
 		return
 	}
 	if errors.Is(err, service.ErrInvalidInput) {
 		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to update property")
 		return
 	}
 
@@ -88,9 +105,13 @@ func (h *PropertyHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *PropertyHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	err := h.service.Delete(id)
+	err := h.service.Delete(r.Context(), id)
 	if errors.Is(err, service.ErrPropertyNotFound) {
 		response.Error(w, http.StatusNotFound, "property not found")
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to delete property")
 		return
 	}
 

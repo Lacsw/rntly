@@ -4,23 +4,21 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Lacsw/rntly/internal/database"
 	"github.com/Lacsw/rntly/internal/handler"
 	"github.com/Lacsw/rntly/internal/service"
 	"github.com/Lacsw/rntly/internal/store"
 )
 
 func main() {
-	// Initialize stores
-	propertyStore := store.NewPropertyStore()
-	tenantStore := store.NewTenantStore()
+	// Connect to database
+	db := database.Connect()
+	defer db.Close()
 
-	// Initialize services
+	// Initialize layers
+	propertyStore := store.NewPropertyStore(db)
 	propertyService := service.NewPropertyService(propertyStore)
-	tenantService := service.NewTenantService(tenantStore)
-
-	// Initialize handlers
 	propertyHandler := handler.NewPropertyHandler(propertyService)
-	tenantHandler := handler.NewTenantHandler(tenantService)
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -34,13 +32,6 @@ func main() {
 	mux.HandleFunc("POST /properties", propertyHandler.Create)
 	mux.HandleFunc("PUT /properties/{id}", propertyHandler.Update)
 	mux.HandleFunc("DELETE /properties/{id}", propertyHandler.Delete)
-
-	// Tenants
-	mux.HandleFunc("GET /tenants", tenantHandler.List)
-	mux.HandleFunc("GET /tenants/{id}", tenantHandler.Get)
-	mux.HandleFunc("POST /tenants", tenantHandler.Create)
-	mux.HandleFunc("PUT /tenants/{id}", tenantHandler.Update)
-	mux.HandleFunc("DELETE /tenants/{id}", tenantHandler.Delete)
 
 	port := ":8080"
 	log.Printf("🏠 rntly API starting on http://localhost%s", port)
