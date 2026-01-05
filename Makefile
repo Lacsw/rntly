@@ -21,7 +21,7 @@ db-logs:
 migrate: db-up
 	@echo "Running migrations..."
 	@for f in migrations/*.sql; do \
-		docker compose exec -T db psql -U rntly -d rntly < "$$f"; \
+    	docker compose exec -T db psql -U rntly -d rntly < "$$f"; \
 	done
 	@echo "Migrations complete!"
 
