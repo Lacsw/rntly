@@ -6,6 +6,7 @@ import (
 
 	"github.com/Lacsw/rntly/internal/database"
 	"github.com/Lacsw/rntly/internal/handler"
+	"github.com/Lacsw/rntly/internal/middleware"
 	"github.com/Lacsw/rntly/internal/service"
 	"github.com/Lacsw/rntly/internal/store"
 )
@@ -62,7 +63,7 @@ func main() {
 	port := ":8080"
 	log.Printf("🏠 rntly API starting on http://localhost%s", port)
 
-	if err := http.ListenAndServe(port, mux); err != nil {
+	if err := http.ListenAndServe(port, middleware.CORS(mux)); err != nil {
 		log.Fatal(err)
 	}
 }
