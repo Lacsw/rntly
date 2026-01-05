@@ -18,16 +18,25 @@ func NewTenantHandler(s *service.TenantService) *TenantHandler {
 }
 
 func (h *TenantHandler) List(w http.ResponseWriter, r *http.Request) {
-	tenants := h.service.List()
+	tenants, err := h.service.List(r.Context())
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to fetch tenants")
+		return
+	}
+
 	response.JSON(w, http.StatusOK, tenants)
 }
 
 func (h *TenantHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	tenant, err := h.service.GetByID(id)
+	tenant, err := h.service.GetByID(r.Context(), id)
 	if errors.Is(err, service.ErrTenantNotFound) {
 		response.Error(w, http.StatusNotFound, "tenant not found")
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to fetch tenant")
 		return
 	}
 
@@ -47,9 +56,13 @@ func (h *TenantHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenant, err := h.service.Create(input.FirstName, input.LastName, input.Email, input.Phone)
+	tenant, err := h.service.Create(r.Context(), input.FirstName, input.LastName, input.Email, input.Phone)
 	if errors.Is(err, service.ErrInvalidInput) {
 		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to create tenant")
 		return
 	}
 
@@ -71,13 +84,17 @@ func (h *TenantHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenant, err := h.service.Update(id, input.FirstName, input.LastName, input.Email, input.Phone)
+	tenant, err := h.service.Update(r.Context(), id, input.FirstName, input.LastName, input.Email, input.Phone)
 	if errors.Is(err, service.ErrTenantNotFound) {
 		response.Error(w, http.StatusNotFound, "tenant not found")
 		return
 	}
 	if errors.Is(err, service.ErrInvalidInput) {
 		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to update tenant")
 		return
 	}
 
@@ -87,9 +104,13 @@ func (h *TenantHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *TenantHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	err := h.service.Delete(id)
+	err := h.service.Delete(r.Context(), id)
 	if errors.Is(err, service.ErrTenantNotFound) {
 		response.Error(w, http.StatusNotFound, "tenant not found")
+		return
+	}
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to delete tenant")
 		return
 	}
 

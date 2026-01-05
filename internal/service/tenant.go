@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -21,19 +22,19 @@ func NewTenantService(s *store.TenantStore) *TenantService {
 	return &TenantService{store: s}
 }
 
-func (s *TenantService) List() []model.Tenant {
-	return s.store.GetAll()
+func (s *TenantService) List(ctx context.Context) ([]model.Tenant, error) {
+	return s.store.GetAll(ctx)
 }
 
-func (s *TenantService) GetByID(id string) (model.Tenant, error) {
-	tenant, err := s.store.GetByID(id)
-	if errors.Is(err, store.ErrTenantNotFound) {
+func (s *TenantService) GetByID(ctx context.Context, id string) (model.Tenant, error) {
+	tenant, err := s.store.GetByID(ctx, id)
+	if errors.Is(err, store.ErrNotFound) {
 		return model.Tenant{}, ErrTenantNotFound
 	}
-	return tenant, nil
+	return tenant, err
 }
 
-func (s *TenantService) Create(firstName, lastName, email, phone string) (model.Tenant, error) {
+func (s *TenantService) Create(ctx context.Context, firstName, lastName, email, phone string) (model.Tenant, error) {
 	if err := s.validateInput(firstName, lastName, email); err != nil {
 		return model.Tenant{}, err
 	}
@@ -48,13 +49,16 @@ func (s *TenantService) Create(firstName, lastName, email, phone string) (model.
 		UpdatedAt: time.Now().UTC(),
 	}
 
-	return s.store.Create(tenant), nil
+	return s.store.Create(ctx, tenant)
 }
 
-func (s *TenantService) Update(id, firstName, lastName, email, phone string) (model.Tenant, error) {
-	existing, err := s.store.GetByID(id)
-	if errors.Is(err, store.ErrTenantNotFound) {
+func (s *TenantService) Update(ctx context.Context, id, firstName, lastName, email, phone string) (model.Tenant, error) {
+	existing, err := s.store.GetByID(ctx, id)
+	if errors.Is(err, store.ErrNotFound) {
 		return model.Tenant{}, ErrTenantNotFound
+	}
+	if err != nil {
+		return model.Tenant{}, err
 	}
 
 	if err := s.validateInput(firstName, lastName, email); err != nil {
@@ -67,16 +71,15 @@ func (s *TenantService) Update(id, firstName, lastName, email, phone string) (mo
 	existing.Phone = phone
 	existing.UpdatedAt = time.Now().UTC()
 
-	updated, _ := s.store.Update(id, existing)
-	return updated, nil
+	return s.store.Update(ctx, existing)
 }
 
-func (s *TenantService) Delete(id string) error {
-	err := s.store.Delete(id)
-	if errors.Is(err, store.ErrTenantNotFound) {
+func (s *TenantService) Delete(ctx context.Context, id string) error {
+	err := s.store.Delete(ctx, id)
+	if errors.Is(err, store.ErrNotFound) {
 		return ErrTenantNotFound
 	}
-	return nil
+	return err
 }
 
 func (s *TenantService) validateInput(firstName, lastName, email string) error {
