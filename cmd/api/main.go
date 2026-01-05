@@ -18,14 +18,17 @@ func main() {
 	// Initialize stores
 	propertyStore := store.NewPropertyStore(db)
 	tenantStore := store.NewTenantStore(db)
+	leaseStore := store.NewLeaseStore(db)
 
 	// Initialize services
 	propertyService := service.NewPropertyService(propertyStore)
 	tenantService := service.NewTenantService(tenantStore)
+	leaseService := service.NewLeaseService(leaseStore, propertyStore, tenantStore)
 
 	// Initialize handlers
 	propertyHandler := handler.NewPropertyHandler(propertyService)
 	tenantHandler := handler.NewTenantHandler(tenantService)
+	leaseHandler := handler.NewLeaseHandler(leaseService)
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -46,6 +49,15 @@ func main() {
 	mux.HandleFunc("POST /tenants", tenantHandler.Create)
 	mux.HandleFunc("PUT /tenants/{id}", tenantHandler.Update)
 	mux.HandleFunc("DELETE /tenants/{id}", tenantHandler.Delete)
+
+	// Leases
+	mux.HandleFunc("GET /leases", leaseHandler.List)
+	mux.HandleFunc("GET /leases/{id}", leaseHandler.Get)
+	mux.HandleFunc("POST /leases", leaseHandler.Create)
+	mux.HandleFunc("PUT /leases/{id}", leaseHandler.Update)
+	mux.HandleFunc("DELETE /leases/{id}", leaseHandler.Delete)
+	mux.HandleFunc("GET /properties/{propertyId}/leases", leaseHandler.GetByProperty)
+	mux.HandleFunc("GET /tenants/{tenantId}/leases", leaseHandler.GetByTenant)
 
 	port := ":8080"
 	log.Printf("🏠 rntly API starting on http://localhost%s", port)
