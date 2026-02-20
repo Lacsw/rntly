@@ -1,4 +1,4 @@
-import api from '../../shared/api/client';
+import api from '../../../shared/api/client';
 import type { TProperty, TPropertyCreate, TPropertyUpdate } from './types';
 
 export const propertiesApi = {
