@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { propertiesApi, type TProperty, type TPropertyCreate } from '../api';
 
-const Properties = () => {
+export const PropertiesPage = () => {
   const [properties, setProperties] = useState<TProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -165,4 +165,4 @@ const Properties = () => {
   );
 };
 
-export default Properties;
+export default PropertiesPage;
