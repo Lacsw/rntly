@@ -17,7 +17,7 @@ const Properties = () => {
     try {
       const { data } = await propertiesApi.getAll();
       setProperties(data);
-    } catch (err) {
+    } catch {
       setError('Failed to fetch properties');
     } finally {
       setLoading(false);
@@ -35,7 +35,7 @@ const Properties = () => {
       setShowForm(false);
       setFormData({ address: '', type: 'apartment', bedrooms: 1, rent_amount: 0 });
       fetchProperties();
-    } catch (err) {
+    } catch {
       setError('Failed to create property');
     }
   };
@@ -45,7 +45,7 @@ const Properties = () => {
     try {
       await propertiesApi.delete(id);
       fetchProperties();
-    } catch (err) {
+    } catch {
       setError('Failed to delete property');
     }
   };
