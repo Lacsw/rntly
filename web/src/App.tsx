@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
+import { DashboardPage as Dashboard } from './domains/dashboard';
 import { PropertiesPage as Properties } from './domains/properties';
 import Tenants from './pages/Tenants';
 import Leases from './pages/Leases';
