@@ -1,4 +1,4 @@
-.PHONY: dev db-up db-down db-logs migrate
+.PHONY: dev db-up db-down db-logs migrate restart
 
 # Start the database container
 db-up:
@@ -28,3 +28,6 @@ migrate: db-up
 # Run the dev server (starts DB if needed, runs migrations)
 dev: migrate
 	@go run cmd/api/main.go
+
+# Restart everything (stop DB, then start fresh)
+restart: db-down dev
