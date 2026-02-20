@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { DashboardPage as Dashboard } from './domains/dashboard';
 import { PropertiesPage as Properties } from './domains/properties';
 import { TenantsPage as Tenants } from './domains/tenants';
-import Leases from './pages/Leases';
+import { LeasesPage as Leases } from './domains/leases';
 
 const App = () => {
   return (
