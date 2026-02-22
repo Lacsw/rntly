@@ -1,30 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import {
-  Building2,
-  LayoutDashboard,
-  Home,
-  Users,
-  FileText,
-  ArrowLeftRight,
-  BarChart3,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+import { Building2, LogOut } from 'lucide-react';
 import { cn } from '../../lib/cn';
-import type { TNavLink, TNavSectionProps } from './types';
-
-const managementLinks: TNavLink[] = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/properties', label: 'Properties', icon: Home },
-  { to: '/tenants', label: 'Tenants', icon: Users },
-  { to: '/contracts', label: 'Contracts', icon: FileText },
-  { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
-];
-
-const systemLinks: TNavLink[] = [
-  { to: '/reports', label: 'Reports', icon: BarChart3 },
-  { to: '/settings', label: 'Settings', icon: Settings },
-];
+import type { TNavSectionProps } from './types';
+import { managementLinks, systemLinks } from './nav-links';
 
 const Sidebar = () => {
   return (
