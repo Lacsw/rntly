@@ -1,3 +1,5 @@
+import { cn } from '../lib/cn';
+
 type StatusBadgeProps = {
   status: string;
   variant?: 'green' | 'yellow';
@@ -10,7 +12,7 @@ const variantClasses = {
 
 export const StatusBadge = ({ status, variant = 'yellow' }: StatusBadgeProps) => {
   return (
-    <span className={`px-2 py-1 rounded text-xs ${variantClasses[variant]}`}>
+    <span className={cn('px-2 py-1 rounded text-xs', variantClasses[variant])}>
       {status}
     </span>
   );

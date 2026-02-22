@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
 } from 'lucide-react';
+import { cn } from '../lib/cn';
 
 const managementLinks = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -77,11 +78,12 @@ const NavSection = ({
         to={to}
         end={to === '/'}
         className={({ isActive }) =>
-          `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          cn(
+            'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
             isActive
               ? 'bg-orange-50 text-orange-800 border-l-2 border-orange-700'
-              : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800'
-          }`
+              : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800',
+          )
         }
       >
         <Icon className="w-5 h-5" />
