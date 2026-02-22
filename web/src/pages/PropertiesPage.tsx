@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { propertiesApi, type TProperty, type TPropertyCreate } from '../api';
+import { propertiesApi, type TProperty, type TPropertyCreate } from '../domains/properties';
 
 export const PropertiesPage = () => {
   const [properties, setProperties] = useState<TProperty[]>([]);
