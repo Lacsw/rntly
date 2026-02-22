@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import { propertiesApi, type TProperty, type TPropertyCreate } from '../domains/properties';
+import { useState } from 'react';
+import { useProperties, type TPropertyCreate } from '../domains/properties';
 
 export const PropertiesPage = () => {
-  const [properties, setProperties] = useState<TProperty[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { properties, loading, error, createProperty, deleteProperty } = useProperties();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<TPropertyCreate>({
     address: '',
@@ -13,41 +11,16 @@ export const PropertiesPage = () => {
     rent_amount: 0,
   });
 
-  const fetchProperties = async () => {
-    try {
-      const { data } = await propertiesApi.getAll();
-      setProperties(data);
-    } catch {
-      setError('Failed to fetch properties');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await propertiesApi.create(formData);
-      setShowForm(false);
-      setFormData({ address: '', type: 'apartment', bedrooms: 1, rent_amount: 0 });
-      fetchProperties();
-    } catch {
-      setError('Failed to create property');
-    }
+    await createProperty(formData);
+    setShowForm(false);
+    setFormData({ address: '', type: 'apartment', bedrooms: 1, rent_amount: 0 });
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure?')) return;
-    try {
-      await propertiesApi.delete(id);
-      fetchProperties();
-    } catch {
-      setError('Failed to delete property');
-    }
+    await deleteProperty(id);
   };
 
   if (loading) return <div className="text-slate-600">Loading...</div>;
