@@ -12,22 +12,22 @@ export const PropertyTable = ({ properties, onDelete }: PropertyTableProps) => {
       <div className="rounded-lg overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50">
-              <th className="text-left p-3 text-gray-500 text-xs uppercase tracking-wider font-medium">Address</th>
-              <th className="text-left p-3 text-gray-500 text-xs uppercase tracking-wider font-medium">Type</th>
-              <th className="text-left p-3 text-gray-500 text-xs uppercase tracking-wider font-medium">Bedrooms</th>
-              <th className="text-left p-3 text-gray-500 text-xs uppercase tracking-wider font-medium">Rent</th>
-              <th className="text-left p-3 text-gray-500 text-xs uppercase tracking-wider font-medium">Status</th>
-              <th className="text-left p-3 text-gray-500 text-xs uppercase tracking-wider font-medium">Actions</th>
+            <tr className="bg-stone-100">
+              <th className="text-left p-3 text-stone-500 text-xs uppercase tracking-wider font-medium">Address</th>
+              <th className="text-left p-3 text-stone-500 text-xs uppercase tracking-wider font-medium">Type</th>
+              <th className="text-left p-3 text-stone-500 text-xs uppercase tracking-wider font-medium">Bedrooms</th>
+              <th className="text-left p-3 text-stone-500 text-xs uppercase tracking-wider font-medium">Rent</th>
+              <th className="text-left p-3 text-stone-500 text-xs uppercase tracking-wider font-medium">Status</th>
+              <th className="text-left p-3 text-stone-500 text-xs uppercase tracking-wider font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {properties.map((property) => (
-              <tr key={property.id} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="p-3">{property.address}</td>
-                <td className="p-3 capitalize">{property.type}</td>
-                <td className="p-3">{property.bedrooms}</td>
-                <td className="p-3">${property.rent_amount}</td>
+              <tr key={property.id} className="border-b border-stone-100 hover:bg-stone-100/50">
+                <td className="p-3 text-stone-700">{property.address}</td>
+                <td className="p-3 capitalize text-stone-600">{property.type}</td>
+                <td className="p-3 text-stone-600">{property.bedrooms}</td>
+                <td className="p-3 text-stone-700">${property.rent_amount}</td>
                 <td className="p-3">
                   <StatusBadge
                     status={property.status}
@@ -49,7 +49,7 @@ export const PropertyTable = ({ properties, onDelete }: PropertyTableProps) => {
       </div>
 
       {properties.length === 0 && (
-        <p className="text-gray-500 mt-4">No properties yet.</p>
+        <p className="text-stone-500 mt-4">No properties yet.</p>
       )}
     </>
   );

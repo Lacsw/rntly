@@ -10,15 +10,15 @@ export const PropertiesPage = () => {
     await deleteProperty(id);
   };
 
-  if (loading) return <div className="text-gray-500">Loading...</div>;
+  if (loading) return <div className="text-stone-500">Loading...</div>;
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
+        <h1 className="text-2xl font-bold text-stone-800">Properties</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600"
+          className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800"
         >
           {showForm ? 'Cancel' : 'Add Property'}
         </button>
