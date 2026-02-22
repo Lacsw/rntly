@@ -1,4 +1,5 @@
 import type { TProperty } from '../api';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
 
 type PropertyTableProps = {
   properties: TProperty[];
@@ -28,15 +29,10 @@ export const PropertyTable = ({ properties, onDelete }: PropertyTableProps) => {
                 <td className="p-3">{property.bedrooms}</td>
                 <td className="p-3">${property.rent_amount}</td>
                 <td className="p-3">
-                  <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      property.status === 'vacant'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}
-                  >
-                    {property.status}
-                  </span>
+                  <StatusBadge
+                    status={property.status}
+                    variant={property.status === 'vacant' ? 'green' : 'yellow'}
+                  />
                 </td>
                 <td className="p-3">
                   <button
