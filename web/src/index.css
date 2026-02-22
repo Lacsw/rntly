@@ -2,3 +2,9 @@
 
 @source "../index.html";
 @source "./**/*.{js,ts,jsx,tsx}";
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
