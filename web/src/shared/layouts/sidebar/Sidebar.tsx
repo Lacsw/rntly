@@ -11,8 +11,9 @@ import {
   LogOut,
 } from 'lucide-react';
 import { cn } from '../../lib/cn';
+import type { TNavLink, TNavSectionProps } from './types';
 
-const managementLinks = [
+const managementLinks: TNavLink[] = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/properties', label: 'Properties', icon: Home },
   { to: '/tenants', label: 'Tenants', icon: Users },
@@ -20,7 +21,7 @@ const managementLinks = [
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
 ];
 
-const systemLinks = [
+const systemLinks: TNavLink[] = [
   { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -61,13 +62,7 @@ const Sidebar = () => {
   );
 };
 
-const NavSection = ({
-  label,
-  links,
-}: {
-  label: string;
-  links: typeof managementLinks;
-}) => (
+const NavSection = ({ label, links }: TNavSectionProps) => (
   <div className="flex flex-col gap-1">
     <span className="text-xs font-semibold text-stone-400 tracking-wider px-3 mb-1">
       {label}
