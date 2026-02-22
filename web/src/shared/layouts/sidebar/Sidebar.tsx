@@ -10,7 +10,7 @@ import {
   Settings,
   LogOut,
 } from 'lucide-react';
-import { cn } from '../lib/cn';
+import { cn } from '../../lib/cn';
 
 const managementLinks = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
