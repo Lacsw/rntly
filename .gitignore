@@ -19,4 +19,6 @@ rntly
 # Test coverage
 coverage.out
 
-.claude
+.claude/*
+!.claude/skills/
+!.claude/rules/
