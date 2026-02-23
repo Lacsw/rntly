@@ -1,6 +1,7 @@
 export type TProperty = {
   id: string;
   address: string;
+  city?: string;
   type: string;
   bedrooms: number;
   rent_amount: number;
@@ -15,9 +16,11 @@ export type TProperty = {
 
 export type TPropertyCreate = {
   address: string;
+  city?: string;
   type: string;
   bedrooms: number;
   rent_amount: number;
+  status?: string;
   name?: string;
   bathrooms?: number;
   image_url?: string;
