@@ -49,6 +49,19 @@ src/
 - **Shared API client** (`shared/api/client.ts`): single axios instance, base URL `http://localhost:8080`.
 - **Layout route**: `MainLayout` wraps all routes via React Router's `<Outlet />`.
 
+### Import aliases
+
+Use the `@` alias (`@/` → `src/`) for imports that cross domain boundaries with 3+ levels of `../`. Keep relative imports for local references within a domain (e.g., `../../api`).
+
+```ts
+// Good — cross-boundary import
+import api from '@/shared/api/client';
+import { StatusBadge } from '@/shared/components/StatusBadge';
+
+// Good — local within domain
+import type { TProperty } from '../../api';
+```
+
 ### Type naming
 
 Domain types use `T` prefix: `TProperty`, `TPropertyCreate`, `TPropertyUpdate`. Three variants per entity: full model, create payload, update payload.
