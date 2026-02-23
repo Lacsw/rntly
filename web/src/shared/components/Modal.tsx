@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-type ModalProps = {
+type TModalProps = {
   open: boolean;
   onClose: () => void;
   title: string;
@@ -10,7 +10,7 @@ type ModalProps = {
   children: ReactNode;
 };
 
-export const Modal = ({ open, onClose, title, icon, children }: ModalProps) => {
+export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => {
   if (!open) return null;
 
   return createPortal(
