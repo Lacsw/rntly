@@ -1,4 +1,4 @@
-import api from '../../../shared/api/client';
+import api from '@/shared/api/client';
 import type { TLease, TLeaseCreate, TLeaseUpdate } from './types';
 
 export const leasesApi = {
