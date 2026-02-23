@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { useProperties, PropertyForm, PropertyCard } from '../domains/properties';
+import { Modal } from '@/shared/components/Modal';
+import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 export const PropertiesPage = () => {
   const { properties, loading, error, createProperty } = useProperties();
@@ -12,10 +15,11 @@ export const PropertiesPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-stone-800">Properties</h1>
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800"
+          onClick={() => setShowForm(true)}
+          className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800 flex items-center gap-2"
         >
-          {showForm ? 'Cancel' : 'Add Property'}
+          <Plus size={18} />
+          Add Property
         </button>
       </div>
 
@@ -25,9 +29,14 @@ export const PropertiesPage = () => {
         </div>
       )}
 
-      {showForm && (
+      <Modal
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Add New Property"
+        icon={<BuildingIcon className="w-6 h-6 text-stone-700" />}
+      >
         <PropertyForm onSubmit={createProperty} onCancel={() => setShowForm(false)} />
-      )}
+      </Modal>
 
       <p className="text-sm text-stone-500 mb-4">
         Showing {properties.length} of {properties.length} properties
