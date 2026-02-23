@@ -14,7 +14,7 @@ const inputClass =
   'w-full border border-stone-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent';
 
 export const FormField = (props: TFormFieldProps) => {
-  const { label, icon, required, placeholder, type = 'text' } = props;
+  const { label, icon, required, placeholder } = props;
 
   return (
     <div>
@@ -23,7 +23,7 @@ export const FormField = (props: TFormFieldProps) => {
         {label}
         {required && <span className="text-red-500">*</span>}
       </label>
-      {type === 'numeric' ? (
+      {props.type === 'numeric' ? (
         <input
           type="text"
           inputMode="numeric"
