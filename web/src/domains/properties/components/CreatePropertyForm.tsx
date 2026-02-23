@@ -35,6 +35,12 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
     onCancel();
   };
 
+  const isValid =
+    (formData.name ?? '').trim() !== '' &&
+    formData.address.trim() !== '' &&
+    (formData.city ?? '').trim() !== '' &&
+    formData.rent_amount > 0;
+
   const inputClass =
     'w-full border border-stone-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent';
 
@@ -180,7 +186,8 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
         </button>
         <button
           type="submit"
-          className="bg-stone-900 text-white rounded-lg py-3 hover:bg-stone-800"
+          disabled={!isValid}
+          className="bg-stone-900 text-white rounded-lg py-3 hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Add Property
         </button>
