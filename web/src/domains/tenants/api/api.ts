@@ -1,4 +1,4 @@
-import api from '../../../shared/api/client';
+import api from '@/shared/api/client';
 import type { TTenant, TTenantCreate, TTenantUpdate } from './types';
 
 export const tenantsApi = {
