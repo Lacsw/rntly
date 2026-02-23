@@ -134,13 +134,14 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
             Bedrooms
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={formData.bedrooms}
-            onChange={(e) =>
-              setFormData({ ...formData, bedrooms: Number(e.target.value) })
-            }
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '');
+              setFormData({ ...formData, bedrooms: val === '' ? 0 : Number(val) });
+            }}
             className={inputClass}
-            min="0"
           />
         </div>
         <div>
@@ -149,28 +150,30 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
             Bathrooms
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={formData.bathrooms}
-            onChange={(e) =>
-              setFormData({ ...formData, bathrooms: Number(e.target.value) })
-            }
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '');
+              setFormData({ ...formData, bathrooms: val === '' ? 0 : Number(val) });
+            }}
             className={inputClass}
-            min="0"
           />
         </div>
         <div>
           <label className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1">
             <DollarSign size={14} />
-            Rent
+            Rent <span className="text-red-500">*</span>
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={formData.rent_amount}
-            onChange={(e) =>
-              setFormData({ ...formData, rent_amount: Number(e.target.value) })
-            }
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '');
+              setFormData({ ...formData, rent_amount: val === '' ? 0 : Number(val) });
+            }}
             className={inputClass}
-            min="0"
           />
         </div>
       </div>
