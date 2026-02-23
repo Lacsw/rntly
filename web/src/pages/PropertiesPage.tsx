@@ -1,14 +1,9 @@
 import { useState } from 'react';
-import { useProperties, PropertyForm, PropertyTable } from '../domains/properties';
+import { useProperties, PropertyForm, PropertyCard } from '../domains/properties';
 
 export const PropertiesPage = () => {
-  const { properties, loading, error, createProperty, deleteProperty } = useProperties();
+  const { properties, loading, error, createProperty } = useProperties();
   const [showForm, setShowForm] = useState(false);
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure?')) return;
-    await deleteProperty(id);
-  };
 
   if (loading) return <div className="text-stone-500">Loading...</div>;
 
@@ -34,7 +29,19 @@ export const PropertiesPage = () => {
         <PropertyForm onSubmit={createProperty} onCancel={() => setShowForm(false)} />
       )}
 
-      <PropertyTable properties={properties} onDelete={handleDelete} />
+      <p className="text-sm text-stone-500 mb-4">
+        Showing {properties.length} of {properties.length} properties
+      </p>
+
+      {properties.length === 0 ? (
+        <p className="text-stone-500">No properties yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {properties.map((property) => (
+            <PropertyCard key={property.id} property={property} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

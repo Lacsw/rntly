@@ -7,6 +7,10 @@ export type TProperty = {
   status: string;
   created_at: string;
   updated_at: string;
+  name?: string;
+  bathrooms?: number;
+  image_url?: string;
+  tenant_name?: string;
 };
 
 export type TPropertyCreate = {
@@ -14,6 +18,10 @@ export type TPropertyCreate = {
   type: string;
   bedrooms: number;
   rent_amount: number;
+  name?: string;
+  bathrooms?: number;
+  image_url?: string;
+  tenant_name?: string;
 };
 
 export type TPropertyUpdate = TPropertyCreate & {
