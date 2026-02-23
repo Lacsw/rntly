@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { MapPin, Bed, Bath, DollarSign } from 'lucide-react';
 import type { TPropertyCreate } from '../api';
 
-type PropertyFormProps = {
+type TCreatePropertyFormProps = {
   onSubmit: (data: TPropertyCreate) => Promise<void>;
   onCancel: () => void;
 };
 
-export const PropertyForm = ({ onSubmit, onCancel }: PropertyFormProps) => {
+export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormProps) => {
   const [formData, setFormData] = useState<TPropertyCreate>({
     name: '',
     address: '',

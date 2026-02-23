@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useProperties, PropertyForm, PropertyCard } from '../domains/properties';
+import { useProperties, CreatePropertyForm, PropertyCard } from '../domains/properties';
 import { Modal } from '@/shared/components/Modal';
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
@@ -35,7 +35,7 @@ export const PropertiesPage = () => {
         title="Add New Property"
         icon={<BuildingIcon className="w-6 h-6 text-stone-700" />}
       >
-        <PropertyForm onSubmit={createProperty} onCancel={() => setShowForm(false)} />
+        <CreatePropertyForm onSubmit={createProperty} onCancel={() => setShowForm(false)} />
       </Modal>
 
       <p className="text-sm text-stone-500 mb-4">
