@@ -38,7 +38,7 @@ export const TenantCard = ({
           aria-label="Tenant actions"
           className="absolute top-3 right-3 p-1.5 hover:bg-stone-100 rounded-full"
         >
-          <MoreVertical size={16} />
+          <MoreVertical size={16} aria-hidden />
         </button>
       )}
 

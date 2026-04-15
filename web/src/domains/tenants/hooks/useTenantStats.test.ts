@@ -58,6 +58,17 @@ describe('useTenantStats', () => {
     expect(result.current.activeTenants).toBe(1);
   });
 
+  it('excludes leases that have not yet started from revenue and active count', () => {
+    const tenants = [mkTenant('t1'), mkTenant('t2')];
+    const leases = [
+      mkLease('l1', 't1', 1850),
+      { ...mkLease('l2', 't2', 2800), start_date: '2027-01-01T00:00:00Z' },
+    ];
+    const { result } = renderHook(() => useTenantStats(tenants, leases, now));
+    expect(result.current.monthlyRevenue).toBe(1850);
+    expect(result.current.activeTenants).toBe(1);
+  });
+
   it('defaults leases to empty array so no-arg callers still work', () => {
     const tenants = [mkTenant('t1')];
     const { result } = renderHook(() => useTenantStats(tenants));
