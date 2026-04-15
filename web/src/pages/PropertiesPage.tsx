@@ -11,7 +11,7 @@ import {
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 export const PropertiesPage = () => {
-  const { properties, loading, error, createProperty } = useProperties();
+  const { properties, loading, error, createProperty, deleteProperty } = useProperties();
   const [showForm, setShowForm] = useState(false);
 
   if (loading) return <Loading />;
@@ -51,7 +51,7 @@ export const PropertiesPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard key={property.id} property={property} onDelete={deleteProperty} />
           ))}
         </div>
       )}
