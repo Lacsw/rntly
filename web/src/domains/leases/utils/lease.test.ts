@@ -85,6 +85,12 @@ describe('leaseDisplayStatus', () => {
     expect(leaseDisplayStatus(build({ status: 'ended' }), now)).toBe('ended');
   });
 
+  it('returns "ended" when status is ended even if start_date is in the future', () => {
+    expect(
+      leaseDisplayStatus(build({ status: 'ended', start_date: '2028-01-01T00:00:00Z' }), now),
+    ).toBe('ended');
+  });
+
   it('returns "ending-soon" when active and within 30 days of end', () => {
     expect(leaseDisplayStatus(build({ end_date: '2026-06-15T00:00:00Z' }), now)).toBe('ending-soon');
   });
