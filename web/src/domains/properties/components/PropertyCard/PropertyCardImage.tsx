@@ -1,6 +1,6 @@
 import { MoreVertical } from 'lucide-react';
 import type { TProperty } from '../../api';
-import { StatusBadge } from '@/shared/components/StatusBadge';
+import { StatusBadge } from '@/shared/components';
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 type PropertyCardImageProps = {
