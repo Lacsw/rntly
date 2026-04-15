@@ -19,8 +19,8 @@ import {
 
 export const TenantsPage = () => {
   const { tenants, loading: tenantsLoading, error, createTenant } = useTenants();
-  const { leases, loading: leasesLoading } = useLeases();
-  const { properties, loading: propsLoading } = useProperties();
+  const { leases, loading: leasesLoading, error: leasesError } = useLeases();
+  const { properties, loading: propsLoading, error: propsError } = useProperties();
   const stats = useTenantStats(tenants, leases);
   const [showForm, setShowForm] = useState(false);
 
@@ -61,6 +61,8 @@ export const TenantsPage = () => {
       />
 
       {error && <ErrorBanner message={error} />}
+      {leasesError && <ErrorBanner message={leasesError} />}
+      {propsError && <ErrorBanner message={propsError} />}
 
       <TenantStatCards {...stats} />
 
