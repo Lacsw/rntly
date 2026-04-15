@@ -25,7 +25,7 @@ export const useProperties = () => {
   const createProperty = async (data: TPropertyCreate) => {
     try {
       await propertiesApi.create(data);
-      fetchProperties();
+      await fetchProperties();
     } catch {
       setError('Failed to create property');
     }
@@ -34,7 +34,7 @@ export const useProperties = () => {
   const deleteProperty = async (id: string) => {
     try {
       await propertiesApi.delete(id);
-      fetchProperties();
+      await fetchProperties();
     } catch {
       setError('Failed to delete property');
     }
