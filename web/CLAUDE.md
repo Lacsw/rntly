@@ -13,11 +13,14 @@ npm run dev        # Vite dev server
 npm run build      # tsc -b && vite build
 npm run lint       # ESLint
 npm run preview    # Preview production build
+npm test           # Run the test suite once
+npm run test:watch # Run the tests in watch mode
+npm run coverage   # Run tests with coverage report
 ```
 
 Type-check without emitting: `npx tsc --noEmit`
 
-No test framework is configured yet.
+Tests use Vitest 4 + @testing-library/react + jsdom. Co-locate tests as `*.test.ts(x)` next to the source file. Shared setup lives at `src/tests/setup.ts`.
 
 Backend (from repo root `/Users/romanfrolov/dev/rntly/`):
 ```bash
