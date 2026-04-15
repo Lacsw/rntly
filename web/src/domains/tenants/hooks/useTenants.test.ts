@@ -105,7 +105,35 @@ describe('useTenants', () => {
     expect(result.current.error).toBe('Failed to delete tenant');
   });
 
-  it('clears a previous error when the next fetch succeeds', async () => {
+  it('clears a mutation error on the next successful operation', async () => {
+    vi.mocked(tenantsApi.create).mockRejectedValueOnce(new Error('create fails'));
+
+    const { result } = renderHook(() => useTenants());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.createTenant({
+        first_name: 'X',
+        last_name: 'Y',
+        email: 'x@y.com',
+        phone: '0',
+      });
+    });
+    expect(result.current.error).toBe('Failed to create tenant');
+
+    vi.mocked(tenantsApi.create).mockResolvedValue({ data: mockTenant } as never);
+    await act(async () => {
+      await result.current.createTenant({
+        first_name: 'OK',
+        last_name: 'Again',
+        email: 'ok@again.com',
+        phone: '1',
+      });
+    });
+    expect(result.current.error).toBe('');
+  });
+
+  it('clears a fetch error when a subsequent mutation triggers a successful refetch', async () => {
     vi.mocked(tenantsApi.getAll).mockRejectedValueOnce(new Error('first fails'));
 
     const { result } = renderHook(() => useTenants());
@@ -121,7 +149,6 @@ describe('useTenants', () => {
         phone: '0',
       });
     });
-
     expect(result.current.error).toBe('');
   });
 });
