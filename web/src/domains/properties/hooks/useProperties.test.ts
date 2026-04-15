@@ -105,4 +105,24 @@ describe('useProperties', () => {
 
     expect(result.current.error).toBe('Failed to delete property');
   });
+
+  it('clears a previous error when the next fetch succeeds', async () => {
+    vi.mocked(propertiesApi.getAll).mockRejectedValueOnce(new Error('first fails'));
+
+    const { result } = renderHook(() => useProperties());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBe('Failed to fetch properties');
+
+    vi.mocked(propertiesApi.create).mockResolvedValue({ data: mockProperty } as never);
+    await act(async () => {
+      await result.current.createProperty({
+        address: 'X',
+        type: 'apartment',
+        bedrooms: 1,
+        rent_amount: 1000,
+      });
+    });
+
+    expect(result.current.error).toBe('');
+  });
 });

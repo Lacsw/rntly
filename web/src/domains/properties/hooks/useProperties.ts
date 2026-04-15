@@ -7,6 +7,7 @@ export const useProperties = () => {
   const [error, setError] = useState('');
 
   const fetchProperties = async () => {
+    setError('');
     try {
       const { data } = await propertiesApi.getAll();
       setProperties(data);
