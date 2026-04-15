@@ -1,7 +1,6 @@
-import { Suspense, lazy } from 'react';
+import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../shared/layouts/MainLayout';
-import { Loading } from '@/shared/components';
 
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
 const PropertiesPage = lazy(() => import('../pages/PropertiesPage'));
@@ -14,20 +13,18 @@ const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<Loading />}>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/properties" element={<PropertiesPage />} />
-          <Route path="/tenants" element={<TenantsPage />} />
-          <Route path="/leases" element={<LeasesPage />} />
-          <Route path="/contracts" element={<ContractsPage />} />
-          <Route path="/transactions" element={<TransactionsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/properties" element={<PropertiesPage />} />
+        <Route path="/tenants" element={<TenantsPage />} />
+        <Route path="/leases" element={<LeasesPage />} />
+        <Route path="/contracts" element={<ContractsPage />} />
+        <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
   );
 };
 
