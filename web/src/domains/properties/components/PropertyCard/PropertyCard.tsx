@@ -1,18 +1,53 @@
-import { MapPin } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, MoreVertical, Trash2 } from 'lucide-react';
 import type { TProperty } from '../../api';
 import { PropertyCardImage } from './PropertyCardImage';
 import { PropertyCardStats } from './PropertyCardStats';
 import { PropertyCardTenant } from './PropertyCardTenant';
+import { ConfirmDialog } from '@/shared/components';
 
-type PropertyCardProps = {
+type TPropertyCardProps = {
   property: TProperty;
+  onDelete?: (id: string) => void;
 };
 
-export const PropertyCard = ({ property }: PropertyCardProps) => {
+export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
   const displayName = property.name ?? property.address;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-stone-100">
+    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-stone-100 relative">
+      {onDelete && (
+        <div className="absolute top-2 right-2 z-10">
+          <button
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="p-1.5 bg-white/90 hover:bg-white rounded-full shadow-sm"
+            aria-label="Property actions"
+          >
+            <MoreVertical size={16} />
+          </button>
+          {menuOpen && (
+            <div
+              className="absolute right-0 mt-1 bg-white border border-stone-100 rounded-lg shadow-md py-1 min-w-[120px]"
+              role="menu"
+            >
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  setConfirmOpen(true);
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left"
+                role="menuitem"
+              >
+                <Trash2 size={14} />
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <PropertyCardImage property={property} displayName={displayName} />
 
       <div className="p-4">
@@ -24,10 +59,23 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
 
         <PropertyCardStats property={property} />
 
-        {property.tenant_name && (
-          <PropertyCardTenant name={property.tenant_name} />
-        )}
+        {property.tenant_name && <PropertyCardTenant name={property.tenant_name} />}
       </div>
+
+      {onDelete && (
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Delete property"
+          message={`Are you sure you want to delete ${displayName}? This cannot be undone.`}
+          confirmLabel="Delete"
+          destructive
+          onConfirm={() => {
+            onDelete(property.id);
+            setConfirmOpen(false);
+          }}
+          onCancel={() => setConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 };

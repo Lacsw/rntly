@@ -1,33 +1,37 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useProperties, CreatePropertyForm, PropertyCard } from '../domains/properties';
-import { Modal } from '@/shared/components/Modal';
+import {
+  Modal,
+  PageHeader,
+  Loading,
+  ErrorBanner,
+  EmptyState,
+} from '@/shared/components';
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 export const PropertiesPage = () => {
-  const { properties, loading, error, createProperty } = useProperties();
+  const { properties, loading, error, createProperty, deleteProperty } = useProperties();
   const [showForm, setShowForm] = useState(false);
 
-  if (loading) return <div className="text-stone-500">Loading...</div>;
+  if (loading) return <Loading />;
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-stone-800">Properties</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800 flex items-center gap-2"
-        >
-          <Plus size={18} />
-          Add Property
-        </button>
-      </div>
+      <PageHeader
+        title="Properties"
+        actions={
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800 flex items-center gap-2"
+          >
+            <Plus size={18} />
+            Add Property
+          </button>
+        }
+      />
 
-      {error && (
-        <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
-          {error}
-        </div>
-      )}
+      {error && <ErrorBanner message={error} />}
 
       <Modal
         open={showForm}
@@ -43,11 +47,11 @@ export const PropertiesPage = () => {
       </p>
 
       {properties.length === 0 ? (
-        <p className="text-stone-500">No properties yet.</p>
+        <EmptyState title="No properties yet" description="Add your first property to get started." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard key={property.id} property={property} onDelete={deleteProperty} />
           ))}
         </div>
       )}

@@ -1,12 +1,16 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './sidebar';
+import { Loading } from '@/shared/components';
 
 const MainLayout = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="flex-1 p-8 bg-stone-50">
-        <Outlet />
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

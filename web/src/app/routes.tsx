@@ -1,13 +1,15 @@
+import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../shared/layouts/MainLayout';
-import { DashboardPage } from '../pages/DashboardPage';
-import { PropertiesPage } from '../pages/PropertiesPage';
-import { TenantsPage } from '../pages/TenantsPage';
-import { LeasesPage } from '../pages/LeasesPage';
-import { ContractsPage } from '../pages/ContractsPage';
-import { TransactionsPage } from '../pages/TransactionsPage';
-import { ReportsPage } from '../pages/ReportsPage';
-import { SettingsPage } from '../pages/SettingsPage';
+
+const DashboardPage = lazy(() => import('../pages/DashboardPage'));
+const PropertiesPage = lazy(() => import('../pages/PropertiesPage'));
+const TenantsPage = lazy(() => import('../pages/TenantsPage'));
+const LeasesPage = lazy(() => import('../pages/LeasesPage'));
+const ContractsPage = lazy(() => import('../pages/ContractsPage'));
+const TransactionsPage = lazy(() => import('../pages/TransactionsPage'));
+const ReportsPage = lazy(() => import('../pages/ReportsPage'));
+const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 
 const AppRoutes = () => {
   return (

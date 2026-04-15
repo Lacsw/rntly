@@ -1,6 +1,5 @@
 import { MapPin, Bed, Bath, DollarSign } from 'lucide-react';
-import { FormField } from '@/shared/components/FormField';
-import { FormSelect } from '@/shared/components/FormSelect';
+import { FormField, FormSelect } from '@/shared/components';
 import type { TPropertyCreate } from '../../api';
 import { useCreatePropertyForm } from '../../hooks/useCreatePropertyForm';
 import { PROPERTY_TYPE_OPTIONS, STATUS_OPTIONS } from './constants';
