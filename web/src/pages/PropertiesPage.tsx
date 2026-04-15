@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useProperties, CreatePropertyForm, PropertyCard } from '../domains/properties';
-import { Modal } from '@/shared/components/Modal';
+import { Modal } from '@/shared/components/ui/Modal';
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 export const PropertiesPage = () => {
