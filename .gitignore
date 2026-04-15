@@ -19,6 +19,9 @@ rntly
 # Test coverage
 coverage.out
 
+# Git worktrees
+.worktrees/
+
 .claude/*
 !.claude/skills/
 !.claude/rules/
