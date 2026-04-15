@@ -1,4 +1,3 @@
-import { MoreVertical } from 'lucide-react';
 import type { TProperty } from '../../api';
 import { StatusBadge } from '@/shared/components';
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
@@ -34,9 +33,6 @@ export const PropertyCardImage = ({ property, displayName }: PropertyCardImagePr
         <span className="bg-white/80 backdrop-blur text-stone-700 text-xs rounded-full px-3 py-1 capitalize">
           {property.type}
         </span>
-        <button className="bg-white/80 backdrop-blur rounded-full p-1 text-stone-600">
-          <MoreVertical className="w-4 h-4" />
-        </button>
       </div>
     </div>
   );
