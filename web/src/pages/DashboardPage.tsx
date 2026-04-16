@@ -15,11 +15,11 @@ import {
 } from '@/shared/components';
 
 export const DashboardPage = () => {
-  const { stats, loading, error } = useDashboardStats();
-  const { properties } = useProperties();
-  const { tenants } = useTenants();
+  const { stats, loading: statsLoading, error: statsError } = useDashboardStats();
+  const { properties, loading: propsLoading, error: propsError } = useProperties();
+  const { tenants, loading: tenantsLoading, error: tenantsError } = useTenants();
 
-  if (loading) return <Loading />;
+  if (statsLoading || propsLoading || tenantsLoading) return <Loading />;
 
   return (
     <div>
@@ -37,7 +37,9 @@ export const DashboardPage = () => {
         }
       />
 
-      {error && <ErrorBanner message={error} />}
+      {statsError && <ErrorBanner message={statsError} />}
+      {propsError && <ErrorBanner message={propsError} />}
+      {tenantsError && <ErrorBanner message={tenantsError} />}
 
       <DashboardStatCards
         totalRevenue={stats.totalRevenue}
