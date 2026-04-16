@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { propertiesApi, type TProperty, type TPropertyCreate } from '../api';
+import { propertiesApi, type TProperty, type TPropertyCreate, type TPropertyUpdate } from '../api';
 
 export const useProperties = () => {
   const [properties, setProperties] = useState<TProperty[]>([]);
@@ -31,6 +31,15 @@ export const useProperties = () => {
     }
   };
 
+  const updateProperty = async (id: string, data: TPropertyUpdate) => {
+    try {
+      await propertiesApi.update(id, data);
+      await fetchProperties();
+    } catch {
+      setError('Failed to update property');
+    }
+  };
+
   const deleteProperty = async (id: string) => {
     try {
       await propertiesApi.delete(id);
@@ -40,5 +49,5 @@ export const useProperties = () => {
     }
   };
 
-  return { properties, loading, error, createProperty, deleteProperty };
+  return { properties, loading, error, createProperty, updateProperty, deleteProperty };
 };

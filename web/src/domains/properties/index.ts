@@ -3,6 +3,7 @@ export { useProperties } from './hooks/useProperties';
 export { useProperty } from './hooks/useProperty';
 export { useCreatePropertyForm } from './hooks/useCreatePropertyForm';
 export { CreatePropertyForm } from './components/CreatePropertyForm';
+export { EditPropertyForm } from './components/EditPropertyForm';
 export { PropertyCard } from './components/PropertyCard';
 export { PropertyDetailHeader } from './components/PropertyDetail/PropertyDetailHeader';
 export { PropertyDetailHero } from './components/PropertyDetail/PropertyDetailHero';
