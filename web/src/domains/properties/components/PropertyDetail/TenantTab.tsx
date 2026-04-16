@@ -28,7 +28,6 @@ export const TenantTab = ({ leases, tenants }: TTenantTabProps) => {
         tenant={tenant}
         lease={activeLease}
         leasesForStatus={leases}
-        paymentRate={100}
       />
     </div>
   );
