@@ -33,3 +33,14 @@ Before every commit, verify:
 - Prefer `textContent` over `innerHTML` when setting text in the DOM.
 - Sanitize URL parameters before using them in API calls or rendering.
 - Use HTTPS for all external requests.
+
+## Additional Patterns
+
+- Never store sensitive data (auth tokens, user PII) in `localStorage`. If client-side persistence is required, use session-scoped storage with short TTLs or encrypt at rest.
+
+## When a Vulnerability Is Found
+
+1. STOP current work
+2. Report the issue with a severity level (critical / important / minor)
+3. Fix before continuing — do not layer new changes on top
+4. Search the codebase for similar patterns and flag them
