@@ -36,7 +36,7 @@ export const PropertyDetailPage = () => {
   const { property, loading: propertyLoading, error: propertyError, refetch } = useProperty(id);
   const { leases, loading: leasesLoading, error: leasesError } = useLeasesByProperty(id);
   const { tenants, loading: tenantsLoading, error: tenantsError } = useTenants();
-  const { updateProperty, deleteProperty } = useProperties();
+  const { updateProperty, deleteProperty, error: propertiesError } = useProperties();
 
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -94,6 +94,7 @@ export const PropertyDetailPage = () => {
       />
       {leasesError && <ErrorBanner message={leasesError} />}
       {tenantsError && <ErrorBanner message={tenantsError} />}
+      {propertiesError && <ErrorBanner message={propertiesError} />}
       <PropertyDetailHero property={property} />
       <PropertyInfoCards property={property} />
       <DetailTabs tabs={tabs} activeId={activeTab} onChange={handleTabChange} />
