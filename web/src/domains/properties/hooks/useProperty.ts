@@ -7,6 +7,7 @@ export const useProperty = (id: string) => {
   const [error, setError] = useState('');
 
   const fetchProperty = useCallback(async (signal?: { cancelled: boolean }) => {
+    setLoading(true);
     setError('');
     try {
       const { data } = await propertiesApi.getById(id);
