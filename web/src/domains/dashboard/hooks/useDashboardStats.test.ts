@@ -178,6 +178,24 @@ describe('useDashboardStats', () => {
     ]);
   });
 
+  it('occupancyRate counts distinct occupied properties, not lease rows', async () => {
+    vi.mocked(propertiesApi.getAll).mockResolvedValue({
+      data: [mkProperty({ id: 'p1' }), mkProperty({ id: 'p2' })],
+    } as never);
+    vi.mocked(leasesApi.getAll).mockResolvedValue({
+      data: [
+        mkLease({ id: 'l1', property_id: 'p1', rent_amount: 1000 }),
+        mkLease({ id: 'l2', property_id: 'p1', rent_amount: 1500 }),
+      ],
+    } as never);
+
+    const { result } = renderHook(() => useDashboardStats(now));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.stats.occupancyRate).toBe(50);
+    expect(result.current.stats.totalRevenue).toBe(2500);
+  });
+
   it('does not re-fetch when parent re-renders without a now prop', async () => {
     const { rerender } = renderHook(() => useDashboardStats());
     await waitFor(() => expect(propertiesApi.getAll).toHaveBeenCalledOnce());

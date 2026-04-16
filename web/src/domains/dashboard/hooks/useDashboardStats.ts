@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import {
   propertiesApi,
   type TProperty,
@@ -24,18 +24,39 @@ const EMPTY_STATS: TDashboardStats = {
   recentLeases: [],
 };
 
+type TState = {
+  stats: TDashboardStats;
+  loading: boolean;
+  error: string;
+};
+
+type TAction =
+  | { type: 'fetching' }
+  | { type: 'success'; stats: TDashboardStats }
+  | { type: 'error' };
+
+const INITIAL_STATE: TState = { stats: EMPTY_STATS, loading: true, error: '' };
+
+function reducer(_state: TState, action: TAction): TState {
+  switch (action.type) {
+    case 'fetching':
+      return { stats: EMPTY_STATS, loading: true, error: '' };
+    case 'success':
+      return { stats: action.stats, loading: false, error: '' };
+    case 'error':
+      return { stats: EMPTY_STATS, loading: false, error: 'Failed to load dashboard' };
+  }
+}
+
 const toMs = (iso: string) => new Date(iso).getTime();
 
 export const useDashboardStats = (nowInput?: Date) => {
   const [now] = useState<Date>(() => nowInput ?? new Date());
-  const [stats, setStats] = useState<TDashboardStats>(EMPTY_STATS);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   useEffect(() => {
     let cancelled = false;
-    setError('');
-    setLoading(true);
+    dispatch({ type: 'fetching' });
 
     Promise.all([
       propertiesApi.getAll(),
@@ -50,8 +71,9 @@ export const useDashboardStats = (nowInput?: Date) => {
 
         const activeLeases = leases.filter((l) => isActiveLease(l, now));
         const totalRevenue = activeLeases.reduce((sum, l) => sum + l.rent_amount, 0);
+        const occupiedPropertyIds = new Set(activeLeases.map((l) => l.property_id));
         const occupancyRate = properties.length > 0
-          ? Math.round((activeLeases.length / properties.length) * 100)
+          ? Math.round((occupiedPropertyIds.size / properties.length) * 100)
           : 0;
 
         const recentProperties = [...properties]
@@ -62,23 +84,20 @@ export const useDashboardStats = (nowInput?: Date) => {
           .sort((a, b) => toMs(b.start_date) - toMs(a.start_date))
           .slice(0, 5);
 
-        setStats({
-          propertyCount: properties.length,
-          tenantCount: tenants.length,
-          totalRevenue,
-          occupancyRate,
-          recentProperties,
-          recentLeases,
+        dispatch({
+          type: 'success',
+          stats: {
+            propertyCount: properties.length,
+            tenantCount: tenants.length,
+            totalRevenue,
+            occupancyRate,
+            recentProperties,
+            recentLeases,
+          },
         });
       })
       .catch(() => {
-        if (!cancelled) {
-          setError('Failed to load dashboard');
-          setStats(EMPTY_STATS);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) dispatch({ type: 'error' });
       });
 
     return () => {
@@ -86,5 +105,5 @@ export const useDashboardStats = (nowInput?: Date) => {
     };
   }, [now]);
 
-  return { stats, loading, error };
+  return { stats: state.stats, loading: state.loading, error: state.error };
 };
