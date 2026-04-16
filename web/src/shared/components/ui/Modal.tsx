@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
@@ -11,6 +12,7 @@ type TModalProps = {
 };
 
 export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => {
+  const titleId = useId();
   if (!open) return null;
 
   return createPortal(
@@ -19,19 +21,24 @@ export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => 
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
         className="bg-white rounded-xl max-w-lg w-full mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             {icon}
-            <h2 className="text-xl font-semibold text-stone-900">{title}</h2>
+            <h2 id={titleId} className="text-xl font-semibold text-stone-900">{title}</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close dialog"
             className="text-stone-400 hover:text-stone-600"
           >
-            <X size={20} />
+            <X size={20} aria-hidden />
           </button>
         </div>
         {children}
