@@ -79,3 +79,49 @@ Domain types use `T` prefix: `TProperty`, `TPropertyCreate`, `TPropertyUpdate`. 
 ## Git Commits
 
 - Do not include "Co-Authored-By" lines in commit messages
+
+---
+
+## .claude Assets
+
+The `.claude/` directory holds rules, skills, agents, and commands adapted from Portal-WEB conventions. Rules auto-load by file context; skills are invokable templates; agents are spawnable specialists; commands are slash-invokable workflows.
+
+### Rules (`.claude/rules/`)
+
+| Rule                      | Scope                                          |
+| ------------------------- | ---------------------------------------------- |
+| `typescript.md`           | `*.ts, *.tsx` — types, null handling           |
+| `react-components.md`     | `*.tsx` — component structure, styling         |
+| `testing.md`              | `*.test.{ts,tsx}` — Vitest, mock factories     |
+| `e2e.md`                  | `e2e/**, *.spec.ts` — Playwright conventions   |
+| `git.md`                  | Always — conventional commits (`refactor`)     |
+| `security.md`             | Always — XSS, secrets, eval, env vars          |
+| `coding-style.md`         | Always — immutability, file size, naming       |
+| `react-best-practices.md` | `*.tsx` — waterfalls, re-renders, JS perf      |
+
+### Skills (`.claude/skills/`)
+
+| Skill             | Purpose                                             |
+| ----------------- | --------------------------------------------------- |
+| `unit-test`       | Vitest + Testing Library patterns (co-located)      |
+| `e2e-test`        | Playwright POM with semantic selectors              |
+| `react-component` | Component creation following rntly patterns         |
+| `url-state`       | `useSearchParams` patterns for tabs, filters, pages |
+| `documentation`   | Docs beside code                                    |
+
+### Agents (`.claude/agents/`)
+
+| Agent              | Purpose                                            |
+| ------------------ | -------------------------------------------------- |
+| `tdd-guide`        | RED-GREEN-REFACTOR with Vitest patterns            |
+| `planner`          | Multi-step implementation plans                    |
+| `architect`        | System design + domain boundaries review           |
+| `refactor-cleaner` | Dead-code and duplicate removal with safety checks |
+
+### Commands (`.claude/commands/`)
+
+| Command          | Purpose                            |
+| ---------------- | ---------------------------------- |
+| `/commit`        | Conventional commit with auto-type |
+| `/verify`        | Lint + typecheck + tests + audit   |
+| `/test-coverage` | Analyze and fill coverage gaps     |
