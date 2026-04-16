@@ -177,4 +177,17 @@ describe('useDashboardStats', () => {
       'l1',
     ]);
   });
+
+  it('does not re-fetch when parent re-renders without a now prop', async () => {
+    const { rerender } = renderHook(() => useDashboardStats());
+    await waitFor(() => expect(propertiesApi.getAll).toHaveBeenCalledOnce());
+
+    rerender();
+    rerender();
+    rerender();
+
+    expect(propertiesApi.getAll).toHaveBeenCalledOnce();
+    expect(tenantsApi.getAll).toHaveBeenCalledOnce();
+    expect(leasesApi.getAll).toHaveBeenCalledOnce();
+  });
 });

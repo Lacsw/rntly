@@ -26,7 +26,8 @@ const EMPTY_STATS: TDashboardStats = {
 
 const toMs = (iso: string) => new Date(iso).getTime();
 
-export const useDashboardStats = (now: Date = new Date()) => {
+export const useDashboardStats = (nowInput?: Date) => {
+  const [now] = useState<Date>(() => nowInput ?? new Date());
   const [stats, setStats] = useState<TDashboardStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
