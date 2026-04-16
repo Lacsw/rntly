@@ -4,6 +4,7 @@ export { ErrorBanner } from './ui/ErrorBanner';
 export { StatCard } from './ui/StatCard';
 export { PageHeader } from './ui/PageHeader';
 export { ConfirmDialog } from './ui/ConfirmDialog';
+export { DetailTabs } from './ui/DetailTabs';
 export { Modal } from './ui/Modal';
 export { StatusBadge } from './ui/StatusBadge';
 export { FormField } from './ui/FormField';
