@@ -40,4 +40,12 @@ describe('DetailTabs', () => {
     render(<DetailTabs tabs={tabs} activeId="nonexistent" onChange={() => {}} />);
     expect(screen.getByText('overview-content')).toBeInTheDocument();
   });
+
+  it('wires tabpanel to active tab via aria-labelledby', () => {
+    render(<DetailTabs tabs={tabs} activeId="tenant" onChange={() => {}} />);
+    const tabButton = screen.getByRole('tab', { name: 'Tenant' });
+    const panel = screen.getByRole('tabpanel');
+    expect(tabButton).toHaveAttribute('id');
+    expect(panel).toHaveAttribute('aria-labelledby', tabButton.id);
+  });
 });

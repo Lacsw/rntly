@@ -13,6 +13,9 @@ type TDetailTabsProps = {
   onChange: (id: string) => void;
 };
 
+const tabButtonId = (id: string) => `tab-${id}`;
+const tabPanelId = (id: string) => `tabpanel-${id}`;
+
 export const DetailTabs = ({ tabs, activeId, onChange }: TDetailTabsProps) => {
   const active = tabs.find((t) => t.id === activeId) ?? tabs[0];
 
@@ -24,9 +27,11 @@ export const DetailTabs = ({ tabs, activeId, onChange }: TDetailTabsProps) => {
           return (
             <button
               key={tab.id}
+              id={tabButtonId(tab.id)}
               role="tab"
               type="button"
               aria-selected={isActive}
+              aria-controls={tabPanelId(tab.id)}
               onClick={() => onChange(tab.id)}
               className={cn(
                 'pb-3 -mb-px border-b-2 text-sm font-medium transition-colors',
@@ -40,7 +45,15 @@ export const DetailTabs = ({ tabs, activeId, onChange }: TDetailTabsProps) => {
           );
         })}
       </div>
-      <div role="tabpanel">{active?.content}</div>
+      {active && (
+        <div
+          role="tabpanel"
+          id={tabPanelId(active.id)}
+          aria-labelledby={tabButtonId(active.id)}
+        >
+          {active.content}
+        </div>
+      )}
     </div>
   );
 };
