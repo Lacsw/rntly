@@ -16,4 +16,10 @@ export const leasesApi = {
 
   delete: (id: string) =>
     api.delete(`/leases/${id}`),
+
+  listByProperty: (propertyId: string) =>
+    api.get<TLease[]>(`/properties/${propertyId}/leases`),
+
+  listByTenant: (tenantId: string) =>
+    api.get<TLease[]>(`/tenants/${tenantId}/leases`),
 };

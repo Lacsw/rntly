@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useTenantStats } from './useTenantStats';
 import type { TTenant } from '../api';
-import type { TLease } from '@/domains/leases/api/types';
+import type { TLease } from '@/domains/leases';
 
 const mkTenant = (id: string): TTenant => ({
   id,

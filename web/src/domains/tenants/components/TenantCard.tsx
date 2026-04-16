@@ -1,6 +1,6 @@
 import { Mail, Phone, Home, MoreVertical } from 'lucide-react';
 import type { TTenant } from '../api';
-import type { TLease } from '@/domains/leases/api/types';
+import type { TLease } from '@/domains/leases';
 import type { TProperty } from '@/domains/properties';
 import { StatusBadge } from '@/shared/components';
 import { formatCurrency, formatDate, initials } from '@/shared/utils';

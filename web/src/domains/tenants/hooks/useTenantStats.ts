@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { TTenant } from '../api';
-import type { TLease } from '@/domains/leases/api/types';
+import type { TLease } from '@/domains/leases';
 import { isActiveTenant } from '../utils/tenant';
 
 type TTenantStats = {

@@ -1,7 +1,94 @@
+import { useMemo, useState } from 'react';
+import { Plus, FileText } from 'lucide-react';
+import {
+  useLeases,
+  useLeaseStats,
+  LeaseCard,
+  CreateLeaseForm,
+  LeaseStatCards,
+} from '../domains/leases';
+import { useProperties } from '../domains/properties';
+import { useTenants } from '../domains/tenants';
+import {
+  Modal,
+  PageHeader,
+  Loading,
+  ErrorBanner,
+  EmptyState,
+} from '@/shared/components';
+
 export const LeasesPage = () => {
+  const { leases, loading: leasesLoading, error: leasesError, createLease } = useLeases();
+  const { properties, loading: propsLoading } = useProperties();
+  const { tenants, loading: tenantsLoading } = useTenants();
+  const stats = useLeaseStats(leases);
+  const [showForm, setShowForm] = useState(false);
+
+  const propertyById = useMemo(() => {
+    const map = new Map<string, (typeof properties)[number]>();
+    for (const p of properties) map.set(p.id, p);
+    return map;
+  }, [properties]);
+
+  const tenantById = useMemo(() => {
+    const map = new Map<string, (typeof tenants)[number]>();
+    for (const t of tenants) map.set(t.id, t);
+    return map;
+  }, [tenants]);
+
+  if (leasesLoading || propsLoading || tenantsLoading) return <Loading />;
+
   return (
     <div>
-      <h1>Leases</h1>
+      <PageHeader
+        title="Leases"
+        subtitle="Track lease agreements between tenants and properties"
+        actions={
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-stone-900 text-white px-4 py-2 rounded hover:bg-stone-800 flex items-center gap-2"
+          >
+            <Plus size={18} aria-hidden />
+            Create Lease
+          </button>
+        }
+      />
+
+      {leasesError && <ErrorBanner message={leasesError} />}
+
+      <LeaseStatCards {...stats} />
+
+      <Modal
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Create New Lease"
+        icon={<FileText className="w-6 h-6 text-stone-700" aria-hidden />}
+      >
+        <CreateLeaseForm
+          properties={properties}
+          tenants={tenants}
+          onSubmit={createLease}
+          onCancel={() => setShowForm(false)}
+        />
+      </Modal>
+
+      {leases.length === 0 ? (
+        <EmptyState
+          title="No leases yet"
+          description="Create your first lease agreement to get started."
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {leases.map((lease) => (
+            <LeaseCard
+              key={lease.id}
+              lease={lease}
+              property={propertyById.get(lease.property_id)}
+              tenant={tenantById.get(lease.tenant_id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

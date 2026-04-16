@@ -1,5 +1,5 @@
 import type { TTenant } from '../api';
-import type { TLease } from '@/domains/leases/api/types';
+import type { TLease } from '@/domains/leases';
 
 export const fullName = (t: TTenant): string => {
   return `${t.first_name} ${t.last_name}`.trim();
