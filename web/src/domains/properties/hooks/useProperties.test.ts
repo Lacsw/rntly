@@ -7,6 +7,7 @@ vi.mock('../api', () => ({
   propertiesApi: {
     getAll: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
     delete: vi.fn(),
   },
 }));
@@ -104,6 +105,43 @@ describe('useProperties', () => {
     });
 
     expect(result.current.error).toBe('Failed to delete property');
+  });
+
+  it('updateProperty calls api with id+data and refetches', async () => {
+    vi.mocked(propertiesApi.update).mockResolvedValue({ data: mockProperty } as never);
+    const { result } = renderHook(() => useProperties());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.updateProperty('1', {
+        address: '789 New',
+        type: 'house',
+        bedrooms: 3,
+        rent_amount: 2500,
+        status: 'vacant',
+      });
+    });
+
+    expect(propertiesApi.update).toHaveBeenCalledWith('1', expect.any(Object));
+    expect(propertiesApi.getAll).toHaveBeenCalledTimes(2);
+  });
+
+  it('sets error when updateProperty fails', async () => {
+    vi.mocked(propertiesApi.update).mockRejectedValue(new Error('boom'));
+    const { result } = renderHook(() => useProperties());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.updateProperty('1', {
+        address: 'X',
+        type: 'apartment',
+        bedrooms: 1,
+        rent_amount: 1000,
+        status: 'vacant',
+      });
+    });
+
+    expect(result.current.error).toBe('Failed to update property');
   });
 
   it('clears a previous error when the next fetch succeeds', async () => {
