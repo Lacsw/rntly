@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin, MoreVertical, Trash2 } from 'lucide-react';
 import type { TProperty } from '../../api';
 import { PropertyCardImage } from './PropertyCardImage';
@@ -16,16 +17,21 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-stone-100 relative">
       {onDelete && (
-        <div className="absolute top-2 right-2 z-10">
+        <div className="absolute top-2 right-2 z-10" onClick={stopPropagation}>
           <button
             onClick={() => setMenuOpen((prev) => !prev)}
             className="p-1.5 bg-white/90 hover:bg-white rounded-full shadow-sm"
             aria-label="Property actions"
           >
-            <MoreVertical size={16} />
+            <MoreVertical size={16} aria-hidden />
           </button>
           {menuOpen && (
             <div
@@ -40,7 +46,7 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
                 className="flex items-center gap-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left"
                 role="menuitem"
               >
-                <Trash2 size={14} />
+                <Trash2 size={14} aria-hidden />
                 Delete
               </button>
             </div>
@@ -48,19 +54,21 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
         </div>
       )}
 
-      <PropertyCardImage property={property} displayName={displayName} />
+      <Link to={`/properties/${property.id}`} className="block">
+        <PropertyCardImage property={property} displayName={displayName} />
 
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-stone-900">{displayName}</h3>
-        <div className="flex items-center gap-1 mt-1 text-sm text-stone-500">
-          <MapPin className="w-3.5 h-3.5" />
-          <span>{property.address}</span>
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-stone-900">{displayName}</h3>
+          <div className="flex items-center gap-1 mt-1 text-sm text-stone-500">
+            <MapPin className="w-3.5 h-3.5" aria-hidden />
+            <span>{property.address}</span>
+          </div>
+
+          <PropertyCardStats property={property} />
+
+          {property.tenant_name && <PropertyCardTenant name={property.tenant_name} />}
         </div>
-
-        <PropertyCardStats property={property} />
-
-        {property.tenant_name && <PropertyCardTenant name={property.tenant_name} />}
-      </div>
+      </Link>
 
       {onDelete && (
         <ConfirmDialog
