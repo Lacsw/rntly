@@ -4,6 +4,7 @@ import MainLayout from '../shared/layouts/MainLayout';
 
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
 const PropertiesPage = lazy(() => import('../pages/PropertiesPage'));
+const PropertyDetailPage = lazy(() => import('../pages/PropertyDetailPage'));
 const TenantsPage = lazy(() => import('../pages/TenantsPage'));
 const LeasesPage = lazy(() => import('../pages/LeasesPage'));
 const ContractsPage = lazy(() => import('../pages/ContractsPage'));
@@ -17,6 +18,7 @@ const AppRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/properties" element={<PropertiesPage />} />
+        <Route path="/properties/:id" element={<PropertyDetailPage />} />
         <Route path="/tenants" element={<TenantsPage />} />
         <Route path="/leases" element={<LeasesPage />} />
         <Route path="/contracts" element={<ContractsPage />} />

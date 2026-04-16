@@ -1,5 +1,14 @@
 export * from './api';
 export { useProperties } from './hooks/useProperties';
+export { useProperty } from './hooks/useProperty';
 export { useCreatePropertyForm } from './hooks/useCreatePropertyForm';
 export { CreatePropertyForm } from './components/CreatePropertyForm';
 export { PropertyCard } from './components/PropertyCard';
+export { PropertyDetailHeader } from './components/PropertyDetail/PropertyDetailHeader';
+export { PropertyDetailHero } from './components/PropertyDetail/PropertyDetailHero';
+export { PropertyInfoCards } from './components/PropertyDetail/PropertyInfoCards';
+export { OverviewTab } from './components/PropertyDetail/OverviewTab';
+export { TenantTab } from './components/PropertyDetail/TenantTab';
+export { ContractsTab } from './components/PropertyDetail/ContractsTab';
+export { FinancialsTab } from './components/PropertyDetail/FinancialsTab';
+export { MaintenanceTab } from './components/PropertyDetail/MaintenanceTab';
