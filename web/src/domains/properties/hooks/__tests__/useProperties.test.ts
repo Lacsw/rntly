@@ -61,7 +61,7 @@ describe('useProperties', () => {
 
     expect(postCalled).toBe(true);
     expect(getCount).toBe(2);
-    expect(toast.success).toHaveBeenCalledWith('Property created');
+    expect(toast.success).toHaveBeenCalledWith('Property added');
   });
 
   it('toasts an error when createProperty fails', async () => {

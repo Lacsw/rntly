@@ -27,7 +27,7 @@ export const useProperties = () => {
     try {
       await propertiesApi.create(data);
       await fetchProperties();
-      toast.success('Property created');
+      toast.success('Property added');
     } catch {
       toast.error('Failed to create property');
     }
