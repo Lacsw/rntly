@@ -106,6 +106,7 @@ export const CreateLeaseForm = ({
           type="numeric"
           value={formData.rent_amount}
           onChange={(v) => updateField('rent_amount', v)}
+          error={errors.rent_amount}
         />
         <FormField
           label="Deposit"

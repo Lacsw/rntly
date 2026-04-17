@@ -10,7 +10,7 @@ type TCreatePropertyFormProps = {
 };
 
 export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormProps) => {
-  const { formData, updateField, reset, isValid } = useCreatePropertyForm();
+  const { formData, updateField, reset, isValid, errors } = useCreatePropertyForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +28,7 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
         placeholder="e.g., 123 Main Street"
         value={formData.address}
         onChange={(v) => updateField('address', v)}
+        error={errors.address}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -60,6 +61,7 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
           type="numeric"
           value={formData.rent_amount}
           onChange={(v) => updateField('rent_amount', v)}
+          error={errors.rent_amount}
         />
       </div>
 

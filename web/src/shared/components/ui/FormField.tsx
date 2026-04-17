@@ -6,6 +6,7 @@ type TFormFieldProps = {
   icon?: ReactNode;
   required?: boolean;
   placeholder?: string;
+  error?: string;
 } & (
   | { type?: 'text'; value: string; onChange: (value: string) => void }
   | { type: 'numeric'; value: number; onChange: (value: number) => void }
@@ -15,8 +16,9 @@ const inputClass =
   'w-full border border-stone-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent';
 
 export const FormField = (props: TFormFieldProps) => {
-  const { label, icon, required, placeholder } = props;
+  const { label, icon, required, placeholder, error } = props;
   const inputId = useId();
+  const errorId = useId();
 
   return (
     <div>
@@ -48,6 +50,8 @@ export const FormField = (props: TFormFieldProps) => {
           }}
           className={inputClass}
           required={required}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
         />
       ) : (
         <input
@@ -58,7 +62,14 @@ export const FormField = (props: TFormFieldProps) => {
           onChange={(e) => props.onChange(e.target.value)}
           className={inputClass}
           required={required}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
         />
+      )}
+      {error && (
+        <p id={errorId} className="text-xs text-red-600 mt-1">
+          {error}
+        </p>
       )}
     </div>
   );

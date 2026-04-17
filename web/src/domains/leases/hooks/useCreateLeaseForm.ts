@@ -12,6 +12,7 @@ const INITIAL: TLeaseCreate = {
 
 type TFormErrors = {
   end_date?: string;
+  rent_amount?: string;
 };
 
 export const useCreateLeaseForm = () => {
@@ -29,6 +30,9 @@ export const useCreateLeaseForm = () => {
   if (!Number.isNaN(start) && !Number.isNaN(end) && end <= start) {
     errors.end_date = 'End date must be after start date';
   }
+  if (formData.rent_amount !== 0 && formData.rent_amount <= 0) {
+    errors.rent_amount = 'Rent must be greater than 0';
+  }
 
   const isValid =
     formData.property_id !== '' &&
@@ -37,7 +41,8 @@ export const useCreateLeaseForm = () => {
     formData.end_date !== '' &&
     formData.rent_amount > 0 &&
     formData.deposit >= 0 &&
-    !errors.end_date;
+    !errors.end_date &&
+    !errors.rent_amount;
 
   return { formData, updateField, reset, isValid, errors };
 };
