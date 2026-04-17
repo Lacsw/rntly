@@ -17,6 +17,6 @@ describe('ErrorBanner', () => {
     const onRetry = vi.fn();
     render(<ErrorBanner message="Oops" onRetry={onRetry} />);
     await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
-    expect(onRetry).toHaveBeenCalledOnce();
+    expect(onRetry).toHaveBeenCalledTimes(1);
   });
 });

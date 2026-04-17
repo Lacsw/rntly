@@ -26,7 +26,7 @@ export const DetailTabs = ({ tabs, activeId, onChange }: TDetailTabsProps) => {
     onChange(id);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>, index: number) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
     if (tabs.length === 0) return;
     let nextIndex: number | null = null;
     switch (e.key) {

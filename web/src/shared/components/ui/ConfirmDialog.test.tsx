@@ -26,14 +26,14 @@ describe('ConfirmDialog', () => {
     const onConfirm = vi.fn();
     render(<ConfirmDialog {...baseProps} onConfirm={onConfirm} />);
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
   it('calls onCancel when the cancel button is clicked', async () => {
     const onCancel = vi.fn();
     render(<ConfirmDialog {...baseProps} onCancel={onCancel} />);
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(onCancel).toHaveBeenCalledOnce();
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
   it('uses a destructive red confirm button when destructive is true', () => {

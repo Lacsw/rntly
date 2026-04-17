@@ -36,7 +36,7 @@ describe('Modal', () => {
       </Modal>,
     );
     await userEvent.keyboard('{Escape}');
-    expect(onClose).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('does not call onClose on Escape when closed', async () => {
