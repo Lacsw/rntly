@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './sidebar';
 import { Loading } from '@/shared/components';
+import { Toaster } from '@/shared/toast';
 
 const MainLayout = () => {
   return (
@@ -12,6 +13,7 @@ const MainLayout = () => {
           <Outlet />
         </Suspense>
       </main>
+      <Toaster />
     </div>
   );
 };
