@@ -48,4 +48,38 @@ describe('DetailTabs', () => {
     expect(tabButton).toHaveAttribute('id');
     expect(panel).toHaveAttribute('aria-labelledby', tabButton.id);
   });
+
+  it('uses roving tabindex so only the active tab is in the Tab sequence', () => {
+    render(<DetailTabs tabs={tabs} activeId="tenant" onChange={() => {}} />);
+    expect(screen.getByRole('tab', { name: 'Tenant' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByRole('tab', { name: 'Contracts' })).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('ArrowRight moves to the next tab and calls onChange', async () => {
+    const onChange = vi.fn();
+    render(<DetailTabs tabs={tabs} activeId="overview" onChange={onChange} />);
+    const first = screen.getByRole('tab', { name: 'Overview' });
+    first.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(onChange).toHaveBeenCalledWith('tenant');
+  });
+
+  it('ArrowLeft wraps from the first tab to the last', async () => {
+    const onChange = vi.fn();
+    render(<DetailTabs tabs={tabs} activeId="overview" onChange={onChange} />);
+    screen.getByRole('tab', { name: 'Overview' }).focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(onChange).toHaveBeenCalledWith('contracts');
+  });
+
+  it('Home jumps to the first tab, End to the last', async () => {
+    const onChange = vi.fn();
+    render(<DetailTabs tabs={tabs} activeId="tenant" onChange={onChange} />);
+    screen.getByRole('tab', { name: 'Tenant' }).focus();
+    await userEvent.keyboard('{End}');
+    expect(onChange).toHaveBeenLastCalledWith('contracts');
+    await userEvent.keyboard('{Home}');
+    expect(onChange).toHaveBeenLastCalledWith('overview');
+  });
 });
