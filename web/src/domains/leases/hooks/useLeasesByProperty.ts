@@ -11,7 +11,7 @@ export const useLeasesByProperty = (propertyId: string) => {
     setError('');
     try {
       const { data } = await leasesApi.listByProperty(id);
-      if (!signal.cancelled) setLeases(data);
+      if (!signal.cancelled) setLeases(data ?? []);
     } catch {
       if (!signal.cancelled) {
         setError('Failed to fetch leases');

@@ -10,7 +10,7 @@ export const useTenants = () => {
     setError('');
     try {
       const { data } = await tenantsApi.getAll();
-      setTenants(data);
+      setTenants(data ?? []);
     } catch {
       setError('Failed to fetch tenants');
     } finally {

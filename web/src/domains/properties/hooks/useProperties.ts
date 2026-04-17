@@ -10,7 +10,7 @@ export const useProperties = () => {
     setError('');
     try {
       const { data } = await propertiesApi.getAll();
-      setProperties(data);
+      setProperties(data ?? []);
     } catch {
       setError('Failed to fetch properties');
     } finally {

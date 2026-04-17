@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     actionTimeout: 10_000,
     navigationTimeout: 15_000,
   },

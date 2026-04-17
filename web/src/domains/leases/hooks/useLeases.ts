@@ -10,7 +10,7 @@ export const useLeases = () => {
     setError('');
     try {
       const { data } = await leasesApi.getAll();
-      setLeases(data);
+      setLeases(data ?? []);
     } catch {
       setError('Failed to fetch leases');
     } finally {

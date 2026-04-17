@@ -28,15 +28,20 @@ test.describe('Properties golden path', () => {
     const created = all.find((p) => p.address === address);
     expect(created).toBeDefined();
     if (created) createdIds.push(created.id);
-
-    await properties.cardLinkByAddress(address).click();
+    const propertyId = created!.id;
 
     const detail = new PropertyDetailPage(page);
+    await detail.goto(propertyId);
+    await page.getByRole('tablist').waitFor();
     await expect(detail.title()).toHaveText(address);
 
-    for (const tabName of ['Overview', 'Tenant', 'Contracts', 'Financials', 'Maintenance']) {
-      await detail.tab(tabName).click();
-      await expect(page).toHaveURL(new RegExp(`\\?tab=${tabName.toLowerCase()}`));
+    for (const label of ['Overview', 'Tenant', 'Contracts', 'Financials', 'Maintenance']) {
+      await page.getByRole('tab', { name: label }).click();
+      await expect(page).toHaveURL(new RegExp(`\\?tab=${label.toLowerCase()}`));
+      await expect(page.getByRole('tab', { name: label })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
     }
 
     await page.goto('/properties');
