@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Home,
   Users,
+  ScrollText,
   FileText,
   ArrowLeftRight,
   BarChart3,
@@ -13,6 +14,7 @@ export const managementLinks: TNavLink[] = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/properties', label: 'Properties', icon: Home },
   { to: '/tenants', label: 'Tenants', icon: Users },
+  { to: '/leases', label: 'Leases', icon: ScrollText },
   { to: '/contracts', label: 'Contracts', icon: FileText },
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
 ];
