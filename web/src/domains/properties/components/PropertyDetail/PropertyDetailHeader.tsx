@@ -8,13 +8,9 @@ type TPropertyDetailHeaderProps = {
 };
 
 export const PropertyDetailHeader = ({ property, actions }: TPropertyDetailHeaderProps) => {
-  const title = property.name ?? property.address;
-  const subtitle = property.name ? property.address : undefined;
-
   return (
     <PageHeader
-      title={title}
-      subtitle={subtitle}
+      title={property.address}
       backHref="/properties"
       actions={
         <div className="flex items-center gap-3">

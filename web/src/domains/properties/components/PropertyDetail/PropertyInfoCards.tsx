@@ -1,4 +1,4 @@
-import { Bed, Bath, DollarSign, Ruler } from 'lucide-react';
+import { Bed, DollarSign, Ruler } from 'lucide-react';
 import type { TProperty } from '../../api';
 import { StatCard } from '@/shared/components';
 import { formatCurrency } from '@/shared/utils';
@@ -12,16 +12,11 @@ type TPropertyWithOptionalSize = TProperty & { square_feet?: number };
 export const PropertyInfoCards = ({ property }: TPropertyInfoCardsProps) => {
   const squareFeet = (property as TPropertyWithOptionalSize).square_feet;
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
       <StatCard
         label="Bedrooms"
         value={property.bedrooms}
         icon={<Bed size={20} aria-hidden />}
-      />
-      <StatCard
-        label="Bathrooms"
-        value={property.bathrooms ?? '—'}
-        icon={<Bath size={20} aria-hidden />}
       />
       <StatCard
         label="Monthly Rent"

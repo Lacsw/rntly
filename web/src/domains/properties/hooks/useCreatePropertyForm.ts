@@ -12,9 +12,7 @@ export const useCreatePropertyForm = () => {
   const reset = () => setFormData(DEFAULT_FORM_DATA);
 
   const isValid =
-    (formData.name ?? '').trim() !== '' &&
     formData.address.trim() !== '' &&
-    (formData.city ?? '').trim() !== '' &&
     formData.rent_amount > 0;
 
   return { formData, updateField, reset, isValid };

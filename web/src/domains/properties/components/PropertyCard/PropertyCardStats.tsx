@@ -1,4 +1,4 @@
-import { Bed, Bath, DollarSign } from 'lucide-react';
+import { Bed, DollarSign } from 'lucide-react';
 import type { TProperty } from '../../api';
 
 type PropertyCardStatsProps = {
@@ -12,12 +12,6 @@ export const PropertyCardStats = ({ property }: PropertyCardStatsProps) => {
         <Bed className="w-4 h-4" />
         <span>{property.bedrooms} bed</span>
       </div>
-      {property.bathrooms != null && (
-        <div className="flex items-center gap-1">
-          <Bath className="w-4 h-4" />
-          <span>{property.bathrooms} bath</span>
-        </div>
-      )}
       <div className="flex items-center gap-1 ml-auto">
         <DollarSign className="w-4 h-4" />
         <span className="font-semibold text-stone-900">

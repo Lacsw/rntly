@@ -1,4 +1,4 @@
-import { MapPin, Bed, Bath, DollarSign } from 'lucide-react';
+import { MapPin, Bed, DollarSign } from 'lucide-react';
 import { FormField, FormSelect } from '@/shared/components';
 import type { TProperty, TPropertyUpdate } from '../api';
 import { useEditPropertyForm } from '../hooks/useEditPropertyForm';
@@ -26,25 +26,11 @@ export const EditPropertyForm = ({ initial, onSubmit, onCancel }: TEditPropertyF
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <FormField
-        label="Property Name"
-        required
-        value={formData.name ?? ''}
-        onChange={(v) => updateField('name', v)}
-      />
-
-      <FormField
         label="Address"
         icon={<MapPin size={14} />}
         required
         value={formData.address}
         onChange={(v) => updateField('address', v)}
-      />
-
-      <FormField
-        label="City"
-        required
-        value={formData.city ?? ''}
-        onChange={(v) => updateField('city', v)}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -62,20 +48,13 @@ export const EditPropertyForm = ({ initial, onSubmit, onCancel }: TEditPropertyF
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <FormField
           label="Bedrooms"
           icon={<Bed size={14} />}
           type="numeric"
           value={formData.bedrooms}
           onChange={(v) => updateField('bedrooms', v)}
-        />
-        <FormField
-          label="Bathrooms"
-          icon={<Bath size={14} />}
-          type="numeric"
-          value={formData.bathrooms ?? 1}
-          onChange={(v) => updateField('bathrooms', v)}
         />
         <FormField
           label="Rent"

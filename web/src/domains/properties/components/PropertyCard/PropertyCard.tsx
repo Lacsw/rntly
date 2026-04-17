@@ -13,7 +13,6 @@ type TPropertyCardProps = {
 };
 
 export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
-  const displayName = property.name ?? property.address;
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -55,14 +54,13 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
       )}
 
       <Link to={`/properties/${property.id}`} className="block">
-        <PropertyCardImage property={property} displayName={displayName} />
+        <PropertyCardImage property={property} />
 
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-stone-900">{displayName}</h3>
-          <div className="flex items-center gap-1 mt-1 text-sm text-stone-500">
-            <MapPin className="w-3.5 h-3.5" aria-hidden />
+          <h3 className="text-lg font-semibold text-stone-900 flex items-center gap-1">
+            <MapPin className="w-4 h-4 text-stone-500" aria-hidden />
             <span>{property.address}</span>
-          </div>
+          </h3>
 
           <PropertyCardStats property={property} />
 
@@ -74,7 +72,7 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
         <ConfirmDialog
           open={confirmOpen}
           title="Delete property"
-          message={`Are you sure you want to delete ${displayName}? This cannot be undone.`}
+          message={`Are you sure you want to delete ${property.address}? This cannot be undone.`}
           confirmLabel="Delete"
           destructive
           onConfirm={() => {

@@ -7,13 +7,12 @@ type TPropertyDetailHeroProps = {
 };
 
 export const PropertyDetailHero = ({ property }: TPropertyDetailHeroProps) => {
-  const displayName = property.name ?? property.address;
   return (
     <div className="relative aspect-[16/9] bg-stone-200 rounded-xl overflow-hidden mb-6">
       {property.image_url ? (
         <img
           src={property.image_url}
-          alt={displayName}
+          alt={property.address}
           className="w-full h-full object-cover"
         />
       ) : (

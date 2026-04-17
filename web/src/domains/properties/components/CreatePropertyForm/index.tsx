@@ -1,4 +1,4 @@
-import { MapPin, Bed, Bath, DollarSign } from 'lucide-react';
+import { MapPin, Bed, DollarSign } from 'lucide-react';
 import { FormField, FormSelect } from '@/shared/components';
 import type { TPropertyCreate } from '../../api';
 import { useCreatePropertyForm } from '../../hooks/useCreatePropertyForm';
@@ -22,28 +22,12 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <FormField
-        label="Property Name"
-        required
-        placeholder="e.g., Downtown Studio Apartment"
-        value={formData.name ?? ''}
-        onChange={(v) => updateField('name', v)}
-      />
-
-      <FormField
         label="Address"
         icon={<MapPin size={14} />}
         required
         placeholder="e.g., 123 Main Street"
         value={formData.address}
         onChange={(v) => updateField('address', v)}
-      />
-
-      <FormField
-        label="City"
-        required
-        placeholder="e.g., Los Angeles"
-        value={formData.city ?? ''}
-        onChange={(v) => updateField('city', v)}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -61,20 +45,13 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <FormField
           label="Bedrooms"
           icon={<Bed size={14} />}
           type="numeric"
           value={formData.bedrooms}
           onChange={(v) => updateField('bedrooms', v)}
-        />
-        <FormField
-          label="Bathrooms"
-          icon={<Bath size={14} />}
-          type="numeric"
-          value={formData.bathrooms ?? 1}
-          onChange={(v) => updateField('bathrooms', v)}
         />
         <FormField
           label="Rent"

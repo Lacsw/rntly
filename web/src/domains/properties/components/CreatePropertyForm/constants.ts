@@ -1,13 +1,10 @@
 import type { TPropertyCreate } from '../../api';
 
 export const DEFAULT_FORM_DATA: TPropertyCreate = {
-  name: '',
   address: '',
-  city: '',
   type: 'apartment',
   status: 'vacant',
   bedrooms: 1,
-  bathrooms: 1,
   rent_amount: 0,
 };
 

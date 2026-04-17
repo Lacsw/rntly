@@ -4,16 +4,15 @@ import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 type PropertyCardImageProps = {
   property: TProperty;
-  displayName: string;
 };
 
-export const PropertyCardImage = ({ property, displayName }: PropertyCardImageProps) => {
+export const PropertyCardImage = ({ property }: PropertyCardImageProps) => {
   return (
     <div className="relative aspect-16/10 bg-stone-200">
       {property.image_url ? (
         <img
           src={property.image_url}
-          alt={displayName}
+          alt={property.address}
           className="w-full h-full object-cover"
         />
       ) : (
