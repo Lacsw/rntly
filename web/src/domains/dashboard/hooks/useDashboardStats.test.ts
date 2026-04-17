@@ -1,113 +1,70 @@
 import { renderHook, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/tests/msw/server';
+import { createMockProperty } from '@/tests/msw/factories/property';
+import { createMockTenant } from '@/tests/msw/factories/tenant';
+import { createMockLease } from '@/tests/msw/factories/lease';
 import { useDashboardStats } from './useDashboardStats';
-import { propertiesApi } from '@/domains/properties';
-import { tenantsApi } from '@/domains/tenants';
-import { leasesApi } from '@/domains/leases';
-import type { TProperty } from '@/domains/properties';
-import type { TTenant } from '@/domains/tenants';
-import type { TLease } from '@/domains/leases';
 
-vi.mock('@/domains/properties', async () => {
-  const actual = await vi.importActual<typeof import('@/domains/properties')>(
-    '@/domains/properties',
-  );
-  return {
-    ...actual,
-    propertiesApi: { getAll: vi.fn() },
-  };
-});
-
-vi.mock('@/domains/tenants', async () => {
-  const actual = await vi.importActual<typeof import('@/domains/tenants')>(
-    '@/domains/tenants',
-  );
-  return {
-    ...actual,
-    tenantsApi: { getAll: vi.fn() },
-  };
-});
-
-vi.mock('@/domains/leases', async () => {
-  const actual = await vi.importActual<typeof import('@/domains/leases')>(
-    '@/domains/leases',
-  );
-  return {
-    ...actual,
-    leasesApi: { getAll: vi.fn() },
-  };
-});
-
-const mkProperty = (overrides: Partial<TProperty>): TProperty => ({
-  id: 'p',
-  address: '123',
-  type: 'apartment',
-  bedrooms: 1,
-  rent_amount: 1000,
-  status: 'vacant',
-  created_at: '2026-01-01T00:00:00Z',
-  updated_at: '2026-01-01T00:00:00Z',
-  ...overrides,
-});
-
-const mkTenant = (id: string): TTenant => ({
-  id,
-  first_name: `F${id}`,
-  last_name: `L${id}`,
-  email: `${id}@e.com`,
-  phone: '0',
-  created_at: '',
-  updated_at: '',
-});
-
-const mkLease = (overrides: Partial<TLease>): TLease => ({
-  id: 'l',
-  property_id: 'p',
-  tenant_id: 't',
-  start_date: '2026-01-01T00:00:00Z',
-  end_date: '2027-01-01T00:00:00Z',
-  rent_amount: 1000,
-  deposit: 0,
-  status: 'active',
-  created_at: '',
-  updated_at: '',
-  ...overrides,
-});
+const API = 'http://localhost:8080';
 
 const now = new Date('2026-06-01T00:00:00Z');
 
+const emptyLists = () =>
+  server.use(
+    http.get(`${API}/properties`, () => HttpResponse.json([])),
+    http.get(`${API}/tenants`, () => HttpResponse.json([])),
+    http.get(`${API}/leases`, () => HttpResponse.json([])),
+  );
+
 describe('useDashboardStats', () => {
-  beforeEach(() => {
-    vi.mocked(propertiesApi.getAll).mockResolvedValue({ data: [] } as never);
-    vi.mocked(tenantsApi.getAll).mockResolvedValue({ data: [] } as never);
-    vi.mocked(leasesApi.getAll).mockResolvedValue({ data: [] } as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('fires all three fetches in parallel on mount', async () => {
+    const hits = { properties: 0, tenants: 0, leases: 0 };
+    server.use(
+      http.get(`${API}/properties`, () => {
+        hits.properties += 1;
+        return HttpResponse.json([]);
+      }),
+      http.get(`${API}/tenants`, () => {
+        hits.tenants += 1;
+        return HttpResponse.json([]);
+      }),
+      http.get(`${API}/leases`, () => {
+        hits.leases += 1;
+        return HttpResponse.json([]);
+      }),
+    );
+
     renderHook(() => useDashboardStats(now));
     await waitFor(() => {
-      expect(propertiesApi.getAll).toHaveBeenCalledOnce();
-      expect(tenantsApi.getAll).toHaveBeenCalledOnce();
-      expect(leasesApi.getAll).toHaveBeenCalledOnce();
+      expect(hits.properties).toBe(1);
+      expect(hits.tenants).toBe(1);
+      expect(hits.leases).toBe(1);
     });
   });
 
   it('derives stats from the fetched lists', async () => {
-    vi.mocked(propertiesApi.getAll).mockResolvedValue({
-      data: [mkProperty({ id: 'p1' }), mkProperty({ id: 'p2' })],
-    } as never);
-    vi.mocked(tenantsApi.getAll).mockResolvedValue({
-      data: [mkTenant('t1'), mkTenant('t2'), mkTenant('t3')],
-    } as never);
-    vi.mocked(leasesApi.getAll).mockResolvedValue({
-      data: [
-        mkLease({ id: 'l1', property_id: 'p1', rent_amount: 1850 }),
-        mkLease({ id: 'l2', property_id: 'p2', rent_amount: 2800, status: 'ended' }),
-      ],
-    } as never);
+    server.use(
+      http.get(`${API}/properties`, () =>
+        HttpResponse.json([
+          createMockProperty({ id: 'p1' }),
+          createMockProperty({ id: 'p2' }),
+        ]),
+      ),
+      http.get(`${API}/tenants`, () =>
+        HttpResponse.json([
+          createMockTenant({ id: 't1' }),
+          createMockTenant({ id: 't2' }),
+          createMockTenant({ id: 't3' }),
+        ]),
+      ),
+      http.get(`${API}/leases`, () =>
+        HttpResponse.json([
+          createMockLease({ id: 'l1', property_id: 'p1', rent_amount: 1850 }),
+          createMockLease({ id: 'l2', property_id: 'p2', rent_amount: 2800, status: 'ended' }),
+        ]),
+      ),
+    );
 
     const { result } = renderHook(() => useDashboardStats(now));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -121,13 +78,18 @@ describe('useDashboardStats', () => {
   });
 
   it('sets error when any fetch fails', async () => {
-    vi.mocked(leasesApi.getAll).mockRejectedValueOnce(new Error('boom'));
+    server.use(
+      http.get(`${API}/properties`, () => HttpResponse.json([])),
+      http.get(`${API}/tenants`, () => HttpResponse.json([])),
+      http.get(`${API}/leases`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useDashboardStats(now));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to load dashboard');
   });
 
   it('returns zero stats when everything is empty', async () => {
+    emptyLists();
     const { result } = renderHook(() => useDashboardStats(now));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.stats.propertyCount).toBe(0);
@@ -139,14 +101,18 @@ describe('useDashboardStats', () => {
   });
 
   it('sorts recentProperties by updated_at desc and limits to 3', async () => {
-    vi.mocked(propertiesApi.getAll).mockResolvedValue({
-      data: [
-        mkProperty({ id: 'p1', updated_at: '2026-01-01T00:00:00Z' }),
-        mkProperty({ id: 'p2', updated_at: '2026-03-01T00:00:00Z' }),
-        mkProperty({ id: 'p3', updated_at: '2026-02-01T00:00:00Z' }),
-        mkProperty({ id: 'p4', updated_at: '2026-04-01T00:00:00Z' }),
-      ],
-    } as never);
+    server.use(
+      http.get(`${API}/properties`, () =>
+        HttpResponse.json([
+          createMockProperty({ id: 'p1', updated_at: '2026-01-01T00:00:00Z' }),
+          createMockProperty({ id: 'p2', updated_at: '2026-03-01T00:00:00Z' }),
+          createMockProperty({ id: 'p3', updated_at: '2026-02-01T00:00:00Z' }),
+          createMockProperty({ id: 'p4', updated_at: '2026-04-01T00:00:00Z' }),
+        ]),
+      ),
+      http.get(`${API}/tenants`, () => HttpResponse.json([])),
+      http.get(`${API}/leases`, () => HttpResponse.json([])),
+    );
 
     const { result } = renderHook(() => useDashboardStats(now));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -155,16 +121,20 @@ describe('useDashboardStats', () => {
   });
 
   it('sorts recentLeases by start_date desc and limits to 5', async () => {
-    vi.mocked(leasesApi.getAll).mockResolvedValue({
-      data: [
-        mkLease({ id: 'l1', start_date: '2026-01-01T00:00:00Z' }),
-        mkLease({ id: 'l2', start_date: '2026-05-01T00:00:00Z' }),
-        mkLease({ id: 'l3', start_date: '2026-03-01T00:00:00Z' }),
-        mkLease({ id: 'l4', start_date: '2026-04-01T00:00:00Z' }),
-        mkLease({ id: 'l5', start_date: '2026-02-01T00:00:00Z' }),
-        mkLease({ id: 'l6', start_date: '2025-12-01T00:00:00Z' }),
-      ],
-    } as never);
+    server.use(
+      http.get(`${API}/properties`, () => HttpResponse.json([])),
+      http.get(`${API}/tenants`, () => HttpResponse.json([])),
+      http.get(`${API}/leases`, () =>
+        HttpResponse.json([
+          createMockLease({ id: 'l1', start_date: '2026-01-01T00:00:00Z' }),
+          createMockLease({ id: 'l2', start_date: '2026-05-01T00:00:00Z' }),
+          createMockLease({ id: 'l3', start_date: '2026-03-01T00:00:00Z' }),
+          createMockLease({ id: 'l4', start_date: '2026-04-01T00:00:00Z' }),
+          createMockLease({ id: 'l5', start_date: '2026-02-01T00:00:00Z' }),
+          createMockLease({ id: 'l6', start_date: '2025-12-01T00:00:00Z' }),
+        ]),
+      ),
+    );
 
     const { result } = renderHook(() => useDashboardStats(now));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -179,15 +149,21 @@ describe('useDashboardStats', () => {
   });
 
   it('occupancyRate counts distinct occupied properties, not lease rows', async () => {
-    vi.mocked(propertiesApi.getAll).mockResolvedValue({
-      data: [mkProperty({ id: 'p1' }), mkProperty({ id: 'p2' })],
-    } as never);
-    vi.mocked(leasesApi.getAll).mockResolvedValue({
-      data: [
-        mkLease({ id: 'l1', property_id: 'p1', rent_amount: 1000 }),
-        mkLease({ id: 'l2', property_id: 'p1', rent_amount: 1500 }),
-      ],
-    } as never);
+    server.use(
+      http.get(`${API}/properties`, () =>
+        HttpResponse.json([
+          createMockProperty({ id: 'p1' }),
+          createMockProperty({ id: 'p2' }),
+        ]),
+      ),
+      http.get(`${API}/tenants`, () => HttpResponse.json([])),
+      http.get(`${API}/leases`, () =>
+        HttpResponse.json([
+          createMockLease({ id: 'l1', property_id: 'p1', rent_amount: 1000 }),
+          createMockLease({ id: 'l2', property_id: 'p1', rent_amount: 1500 }),
+        ]),
+      ),
+    );
 
     const { result } = renderHook(() => useDashboardStats(now));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -197,15 +173,31 @@ describe('useDashboardStats', () => {
   });
 
   it('does not re-fetch when parent re-renders without a now prop', async () => {
+    const hits = { properties: 0, tenants: 0, leases: 0 };
+    server.use(
+      http.get(`${API}/properties`, () => {
+        hits.properties += 1;
+        return HttpResponse.json([]);
+      }),
+      http.get(`${API}/tenants`, () => {
+        hits.tenants += 1;
+        return HttpResponse.json([]);
+      }),
+      http.get(`${API}/leases`, () => {
+        hits.leases += 1;
+        return HttpResponse.json([]);
+      }),
+    );
+
     const { rerender } = renderHook(() => useDashboardStats());
-    await waitFor(() => expect(propertiesApi.getAll).toHaveBeenCalledOnce());
+    await waitFor(() => expect(hits.properties).toBe(1));
 
     rerender();
     rerender();
     rerender();
 
-    expect(propertiesApi.getAll).toHaveBeenCalledOnce();
-    expect(tenantsApi.getAll).toHaveBeenCalledOnce();
-    expect(leasesApi.getAll).toHaveBeenCalledOnce();
+    expect(hits.properties).toBe(1);
+    expect(hits.tenants).toBe(1);
+    expect(hits.leases).toBe(1);
   });
 });
