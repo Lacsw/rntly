@@ -10,3 +10,4 @@ export { StatusBadge } from './ui/StatusBadge';
 export { FormField } from './ui/FormField';
 export { FormSelect } from './ui/FormSelect';
 export { Skeleton } from './ui/Skeleton';
+export { StatCardSkeleton } from './ui/StatCardSkeleton';
