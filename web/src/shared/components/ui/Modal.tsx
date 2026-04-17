@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
@@ -11,8 +11,31 @@ type TModalProps = {
   children: ReactNode;
 };
 
+const FOCUSABLE_SELECTOR =
+  'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => {
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    const body = bodyRef.current;
+    const dialog = dialogRef.current;
+    const target = body?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+    (target ?? dialog)?.focus();
+  }, [open]);
+
   if (!open) return null;
 
   return createPortal(
@@ -21,10 +44,12 @@ export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => 
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="bg-white rounded-xl max-w-lg w-full mx-4 p-6"
+        tabIndex={-1}
+        className="bg-white rounded-xl max-w-lg w-full mx-4 p-6 outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -41,7 +66,7 @@ export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => 
             <X size={20} aria-hidden />
           </button>
         </div>
-        {children}
+        <div ref={bodyRef}>{children}</div>
       </div>
     </div>,
     document.body,
