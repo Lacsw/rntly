@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { ReactNode } from 'react';
 
 type TFormFieldProps = {
@@ -15,16 +16,21 @@ const inputClass =
 
 export const FormField = (props: TFormFieldProps) => {
   const { label, icon, required, placeholder } = props;
+  const inputId = useId();
 
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1">
+      <label
+        htmlFor={inputId}
+        className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1"
+      >
         {icon}
         {label}
         {required && <span className="text-red-500">*</span>}
       </label>
       {props.type === 'numeric' ? (
         <input
+          id={inputId}
           type="number"
           inputMode="numeric"
           min={0}
@@ -45,6 +51,7 @@ export const FormField = (props: TFormFieldProps) => {
         />
       ) : (
         <input
+          id={inputId}
           type="text"
           placeholder={placeholder}
           value={props.value}
