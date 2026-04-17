@@ -1,5 +1,5 @@
-import { isActiveLease, daysRemaining, isEndingSoon, leaseDisplayStatus } from './lease';
-import type { TLease } from '../api';
+import { isActiveLease, daysRemaining, isEndingSoon, leaseDisplayStatus } from '../lease';
+import type { TLease } from '../../api';
 
 const build = (o: Partial<TLease>): TLease => ({
   id: 'l',

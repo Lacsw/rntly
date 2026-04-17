@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
-import { useLeaseStats } from './useLeaseStats';
-import type { TLease } from '../api';
+import { useLeaseStats } from '../useLeaseStats';
+import type { TLease } from '../../api';
 
 const build = (o: Partial<TLease>): TLease => ({
   id: 'l',

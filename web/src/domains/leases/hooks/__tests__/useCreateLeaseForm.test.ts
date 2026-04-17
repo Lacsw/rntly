@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCreateLeaseForm } from './useCreateLeaseForm';
+import { useCreateLeaseForm } from '../useCreateLeaseForm';
 
 describe('useCreateLeaseForm', () => {
   it('starts empty and isValid false', () => {

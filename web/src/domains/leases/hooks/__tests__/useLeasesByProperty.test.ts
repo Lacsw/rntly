@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/msw/server';
 import { createMockLease } from '@/tests/msw/factories/lease';
-import { useLeasesByProperty } from './useLeasesByProperty';
+import { useLeasesByProperty } from '../useLeasesByProperty';
 
 const API = 'http://localhost:8080';
 
