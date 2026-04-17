@@ -44,11 +44,13 @@ export const useProperties = () => {
   };
 
   const deleteProperty = async (id: string) => {
+    const snapshot = properties;
+    setProperties(snapshot.filter((p) => p.id !== id));
     try {
       await propertiesApi.delete(id);
-      await fetchProperties();
       toast.success('Property deleted');
     } catch {
+      setProperties(snapshot);
       toast.error('Failed to delete property');
     }
   };

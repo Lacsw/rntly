@@ -84,13 +84,13 @@ describe('useTenants', () => {
     expect(result.current.error).toBe('');
   });
 
-  it('deleteTenant calls the api with the id and refetches the list', async () => {
+  it('deleteTenant removes the item optimistically and calls the api', async () => {
     let getCount = 0;
     let deletedId: string | null = null;
     server.use(
       http.get(`${API}/tenants`, () => {
         getCount += 1;
-        return HttpResponse.json([createMockTenant()]);
+        return HttpResponse.json([createMockTenant({ id: 't1' })]);
       }),
       http.delete(`${API}/tenants/:id`, ({ params }) => {
         deletedId = String(params.id);
@@ -99,27 +99,31 @@ describe('useTenants', () => {
     );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.tenants).toHaveLength(1);
 
     await act(async () => {
-      await result.current.deleteTenant('1');
+      await result.current.deleteTenant('t1');
     });
 
-    expect(deletedId).toBe('1');
-    expect(getCount).toBe(2);
+    expect(deletedId).toBe('t1');
+    expect(getCount).toBe(1);
+    expect(result.current.tenants).toHaveLength(0);
     expect(toast.success).toHaveBeenCalledWith('Tenant deleted');
   });
 
-  it('toasts an error when deleteTenant fails', async () => {
+  it('reverts the optimistic delete and toasts on error', async () => {
     server.use(
       http.delete(`${API}/tenants/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
+    const before = result.current.tenants;
 
     await act(async () => {
-      await result.current.deleteTenant('1');
+      await result.current.deleteTenant('t1');
     });
 
+    expect(result.current.tenants).toEqual(before);
     expect(toast.error).toHaveBeenCalledWith('Failed to delete tenant');
   });
 

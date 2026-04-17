@@ -84,13 +84,13 @@ describe('useProperties', () => {
     expect(result.current.error).toBe('');
   });
 
-  it('deleteProperty calls the api with the id and refetches the list', async () => {
+  it('deleteProperty removes the item optimistically and calls the api', async () => {
     let getCount = 0;
     let deletedId: string | null = null;
     server.use(
       http.get(`${API}/properties`, () => {
         getCount += 1;
-        return HttpResponse.json([createMockProperty()]);
+        return HttpResponse.json([createMockProperty({ id: 'p1' })]);
       }),
       http.delete(`${API}/properties/:id`, ({ params }) => {
         deletedId = String(params.id);
@@ -99,17 +99,19 @@ describe('useProperties', () => {
     );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.properties).toHaveLength(1);
 
     await act(async () => {
-      await result.current.deleteProperty('1');
+      await result.current.deleteProperty('p1');
     });
 
-    expect(deletedId).toBe('1');
-    expect(getCount).toBe(2);
+    expect(deletedId).toBe('p1');
+    expect(getCount).toBe(1);
+    expect(result.current.properties).toHaveLength(0);
     expect(toast.success).toHaveBeenCalledWith('Property deleted');
   });
 
-  it('toasts an error when deleteProperty fails', async () => {
+  it('reverts the optimistic delete and toasts on error', async () => {
     server.use(
       http.delete(`${API}/properties/:id`, () =>
         HttpResponse.json({ error: 'boom' }, { status: 500 }),
@@ -117,11 +119,13 @@ describe('useProperties', () => {
     );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
+    const before = result.current.properties;
 
     await act(async () => {
-      await result.current.deleteProperty('1');
+      await result.current.deleteProperty('p1');
     });
 
+    expect(result.current.properties).toEqual(before);
     expect(toast.error).toHaveBeenCalledWith('Failed to delete property');
   });
 

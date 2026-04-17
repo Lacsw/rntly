@@ -34,11 +34,13 @@ export const useTenants = () => {
   };
 
   const deleteTenant = async (id: string) => {
+    const snapshot = tenants;
+    setTenants(snapshot.filter((t) => t.id !== id));
     try {
       await tenantsApi.delete(id);
-      await fetchTenants();
       toast.success('Tenant deleted');
     } catch {
+      setTenants(snapshot);
       toast.error('Failed to delete tenant');
     }
   };

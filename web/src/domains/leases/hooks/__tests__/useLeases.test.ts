@@ -138,13 +138,13 @@ describe('useLeases', () => {
     expect(toast.error).toHaveBeenCalledWith('Failed to update lease');
   });
 
-  it('deleteLease calls api with id and refetches', async () => {
+  it('deleteLease removes the item optimistically and calls the api', async () => {
     let getCount = 0;
     let deletedId: string | null = null;
     server.use(
       http.get(`${API}/leases`, () => {
         getCount += 1;
-        return HttpResponse.json([createMockLease()]);
+        return HttpResponse.json([createMockLease({ id: 'l1' })]);
       }),
       http.delete(`${API}/leases/:id`, ({ params }) => {
         deletedId = String(params.id);
@@ -153,27 +153,31 @@ describe('useLeases', () => {
     );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.leases).toHaveLength(1);
 
     await act(async () => {
       await result.current.deleteLease('l1');
     });
 
     expect(deletedId).toBe('l1');
-    expect(getCount).toBe(2);
+    expect(getCount).toBe(1);
+    expect(result.current.leases).toHaveLength(0);
     expect(toast.success).toHaveBeenCalledWith('Lease deleted');
   });
 
-  it('toasts an error when deleteLease fails', async () => {
+  it('reverts the optimistic delete and toasts on error', async () => {
     server.use(
       http.delete(`${API}/leases/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
+    const before = result.current.leases;
 
     await act(async () => {
       await result.current.deleteLease('l1');
     });
 
+    expect(result.current.leases).toEqual(before);
     expect(toast.error).toHaveBeenCalledWith('Failed to delete lease');
   });
 });

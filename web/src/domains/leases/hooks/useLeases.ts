@@ -44,11 +44,13 @@ export const useLeases = () => {
   };
 
   const deleteLease = async (id: string) => {
+    const snapshot = leases;
+    setLeases(snapshot.filter((l) => l.id !== id));
     try {
       await leasesApi.delete(id);
-      await fetchLeases();
       toast.success('Lease deleted');
     } catch {
+      setLeases(snapshot);
       toast.error('Failed to delete lease');
     }
   };
