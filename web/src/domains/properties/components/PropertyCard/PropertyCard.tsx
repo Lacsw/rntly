@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, MoreVertical, Trash2 } from 'lucide-react';
 import type { TProperty } from '../../api';
@@ -15,6 +15,7 @@ type TPropertyCardProps = {
 export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const menuId = useId();
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,18 +27,24 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
       {onDelete && (
         <div className="absolute top-2 right-2 z-10" onClick={stopPropagation}>
           <button
+            type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
             className="p-1.5 bg-white/90 hover:bg-white rounded-full shadow-sm"
             aria-label="Property actions"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-controls={menuId}
           >
             <MoreVertical size={16} aria-hidden />
           </button>
           {menuOpen && (
             <div
+              id={menuId}
               className="absolute right-0 mt-1 bg-white border border-stone-100 rounded-lg shadow-md py-1 min-w-[120px]"
               role="menu"
             >
               <button
+                type="button"
                 onClick={() => {
                   setMenuOpen(false);
                   setConfirmOpen(true);
