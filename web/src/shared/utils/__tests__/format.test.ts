@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, initials } from './format';
+import { formatCurrency, formatDate, initials } from '../format';
 
 describe('formatCurrency', () => {
   it('formats positive whole dollars with US locale', () => {
