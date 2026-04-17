@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { tenantsApi, type TTenant, type TTenantCreate } from '../api';
+import { toast } from '@/shared/toast';
 
 export const useTenants = () => {
   const [tenants, setTenants] = useState<TTenant[]>([]);
@@ -27,7 +28,7 @@ export const useTenants = () => {
       await tenantsApi.create(data);
       await fetchTenants();
     } catch {
-      setError('Failed to create tenant');
+      toast.error('Failed to create tenant');
     }
   };
 
@@ -36,7 +37,7 @@ export const useTenants = () => {
       await tenantsApi.delete(id);
       await fetchTenants();
     } catch {
-      setError('Failed to delete tenant');
+      toast.error('Failed to delete tenant');
     }
   };
 

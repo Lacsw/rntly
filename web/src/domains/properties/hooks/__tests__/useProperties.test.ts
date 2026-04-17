@@ -2,11 +2,21 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/msw/server';
 import { createMockProperty } from '@/tests/msw/factories/property';
+import { toast } from '@/shared/toast';
 import { useProperties } from '../useProperties';
+
+vi.mock('@/shared/toast', () => ({
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
 
 const API = 'http://localhost:8080';
 
 describe('useProperties', () => {
+  afterEach(() => {
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.error).mockClear();
+  });
+
   it('fetches properties on mount and exposes them', async () => {
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -53,7 +63,7 @@ describe('useProperties', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when createProperty fails', async () => {
+  it('toasts an error when createProperty fails', async () => {
     server.use(
       http.post(`${API}/properties`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -69,7 +79,8 @@ describe('useProperties', () => {
       });
     });
 
-    expect(result.current.error).toBe('Failed to create property');
+    expect(toast.error).toHaveBeenCalledWith('Failed to create property');
+    expect(result.current.error).toBe('');
   });
 
   it('deleteProperty calls the api with the id and refetches the list', async () => {
@@ -96,7 +107,7 @@ describe('useProperties', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when deleteProperty fails', async () => {
+  it('toasts an error when deleteProperty fails', async () => {
     server.use(
       http.delete(`${API}/properties/:id`, () =>
         HttpResponse.json({ error: 'boom' }, { status: 500 }),
@@ -109,7 +120,7 @@ describe('useProperties', () => {
       await result.current.deleteProperty('1');
     });
 
-    expect(result.current.error).toBe('Failed to delete property');
+    expect(toast.error).toHaveBeenCalledWith('Failed to delete property');
   });
 
   it('updateProperty calls api with id+data and refetches', async () => {
@@ -142,7 +153,7 @@ describe('useProperties', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when updateProperty fails', async () => {
+  it('toasts an error when updateProperty fails', async () => {
     server.use(
       http.put(`${API}/properties/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -159,10 +170,10 @@ describe('useProperties', () => {
       });
     });
 
-    expect(result.current.error).toBe('Failed to update property');
+    expect(toast.error).toHaveBeenCalledWith('Failed to update property');
   });
 
-  it('clears a previous error when the next fetch succeeds', async () => {
+  it('clears a previous fetch error when the next fetch succeeds', async () => {
     server.use(
       http.get(`${API}/properties`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
         once: true,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { propertiesApi, type TProperty, type TPropertyCreate, type TPropertyUpdate } from '../api';
+import { toast } from '@/shared/toast';
 
 export const useProperties = () => {
   const [properties, setProperties] = useState<TProperty[]>([]);
@@ -27,7 +28,7 @@ export const useProperties = () => {
       await propertiesApi.create(data);
       await fetchProperties();
     } catch {
-      setError('Failed to create property');
+      toast.error('Failed to create property');
     }
   };
 
@@ -36,7 +37,7 @@ export const useProperties = () => {
       await propertiesApi.update(id, data);
       await fetchProperties();
     } catch {
-      setError('Failed to update property');
+      toast.error('Failed to update property');
     }
   };
 
@@ -45,7 +46,7 @@ export const useProperties = () => {
       await propertiesApi.delete(id);
       await fetchProperties();
     } catch {
-      setError('Failed to delete property');
+      toast.error('Failed to delete property');
     }
   };
 

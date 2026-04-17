@@ -2,11 +2,21 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/msw/server';
 import { createMockTenant } from '@/tests/msw/factories/tenant';
+import { toast } from '@/shared/toast';
 import { useTenants } from '../useTenants';
+
+vi.mock('@/shared/toast', () => ({
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
 
 const API = 'http://localhost:8080';
 
 describe('useTenants', () => {
+  afterEach(() => {
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.error).mockClear();
+  });
+
   it('fetches tenants on mount and exposes them', async () => {
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -53,7 +63,7 @@ describe('useTenants', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when createTenant fails', async () => {
+  it('toasts an error when createTenant fails', async () => {
     server.use(
       http.post(`${API}/tenants`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -69,7 +79,8 @@ describe('useTenants', () => {
       });
     });
 
-    expect(result.current.error).toBe('Failed to create tenant');
+    expect(toast.error).toHaveBeenCalledWith('Failed to create tenant');
+    expect(result.current.error).toBe('');
   });
 
   it('deleteTenant calls the api with the id and refetches the list', async () => {
@@ -96,7 +107,7 @@ describe('useTenants', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when deleteTenant fails', async () => {
+  it('toasts an error when deleteTenant fails', async () => {
     server.use(
       http.delete(`${API}/tenants/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -107,38 +118,7 @@ describe('useTenants', () => {
       await result.current.deleteTenant('1');
     });
 
-    expect(result.current.error).toBe('Failed to delete tenant');
-  });
-
-  it('clears a mutation error on the next successful operation', async () => {
-    server.use(
-      http.post(`${API}/tenants`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
-        once: true,
-      }),
-    );
-
-    const { result } = renderHook(() => useTenants());
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    await act(async () => {
-      await result.current.createTenant({
-        first_name: 'X',
-        last_name: 'Y',
-        email: 'x@y.com',
-        phone: '0',
-      });
-    });
-    expect(result.current.error).toBe('Failed to create tenant');
-
-    await act(async () => {
-      await result.current.createTenant({
-        first_name: 'OK',
-        last_name: 'Again',
-        email: 'ok@again.com',
-        phone: '1',
-      });
-    });
-    expect(result.current.error).toBe('');
+    expect(toast.error).toHaveBeenCalledWith('Failed to delete tenant');
   });
 
   it('clears a fetch error when a subsequent mutation triggers a successful refetch', async () => {

@@ -2,11 +2,21 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/msw/server';
 import { createMockLease } from '@/tests/msw/factories/lease';
+import { toast } from '@/shared/toast';
 import { useLeases } from '../useLeases';
+
+vi.mock('@/shared/toast', () => ({
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
 
 const API = 'http://localhost:8080';
 
 describe('useLeases', () => {
+  afterEach(() => {
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.error).mockClear();
+  });
+
   it('fetches leases on mount', async () => {
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -55,7 +65,7 @@ describe('useLeases', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when createLease fails', async () => {
+  it('toasts an error when createLease fails', async () => {
     server.use(
       http.post(`${API}/leases`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -73,7 +83,7 @@ describe('useLeases', () => {
       });
     });
 
-    expect(result.current.error).toBe('Failed to create lease');
+    expect(toast.error).toHaveBeenCalledWith('Failed to create lease');
   });
 
   it('updateLease calls api with id and data, then refetches', async () => {
@@ -106,7 +116,7 @@ describe('useLeases', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when updateLease fails', async () => {
+  it('toasts an error when updateLease fails', async () => {
     server.use(
       http.put(`${API}/leases/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -123,7 +133,7 @@ describe('useLeases', () => {
       });
     });
 
-    expect(result.current.error).toBe('Failed to update lease');
+    expect(toast.error).toHaveBeenCalledWith('Failed to update lease');
   });
 
   it('deleteLease calls api with id and refetches', async () => {
@@ -150,7 +160,7 @@ describe('useLeases', () => {
     expect(getCount).toBe(2);
   });
 
-  it('sets error when deleteLease fails', async () => {
+  it('toasts an error when deleteLease fails', async () => {
     server.use(
       http.delete(`${API}/leases/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
     );
@@ -161,40 +171,6 @@ describe('useLeases', () => {
       await result.current.deleteLease('l1');
     });
 
-    expect(result.current.error).toBe('Failed to delete lease');
-  });
-
-  it('clears a mutation error on the next successful operation', async () => {
-    server.use(
-      http.post(`${API}/leases`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
-        once: true,
-      }),
-    );
-    const { result } = renderHook(() => useLeases());
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    await act(async () => {
-      await result.current.createLease({
-        property_id: 'p1',
-        tenant_id: 't1',
-        start_date: '2026-01-01',
-        end_date: '2027-01-01',
-        rent_amount: 1000,
-        deposit: 1000,
-      });
-    });
-    expect(result.current.error).toBe('Failed to create lease');
-
-    await act(async () => {
-      await result.current.createLease({
-        property_id: 'p2',
-        tenant_id: 't2',
-        start_date: '2026-01-01',
-        end_date: '2027-01-01',
-        rent_amount: 1000,
-        deposit: 1000,
-      });
-    });
-    expect(result.current.error).toBe('');
+    expect(toast.error).toHaveBeenCalledWith('Failed to delete lease');
   });
 });

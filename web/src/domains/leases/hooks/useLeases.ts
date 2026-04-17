@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { leasesApi, type TLease, type TLeaseCreate, type TLeaseUpdate } from '../api';
+import { toast } from '@/shared/toast';
 
 export const useLeases = () => {
   const [leases, setLeases] = useState<TLease[]>([]);
@@ -27,7 +28,7 @@ export const useLeases = () => {
       await leasesApi.create(data);
       await fetchLeases();
     } catch {
-      setError('Failed to create lease');
+      toast.error('Failed to create lease');
     }
   };
 
@@ -36,7 +37,7 @@ export const useLeases = () => {
       await leasesApi.update(id, data);
       await fetchLeases();
     } catch {
-      setError('Failed to update lease');
+      toast.error('Failed to update lease');
     }
   };
 
@@ -45,7 +46,7 @@ export const useLeases = () => {
       await leasesApi.delete(id);
       await fetchLeases();
     } catch {
-      setError('Failed to delete lease');
+      toast.error('Failed to delete lease');
     }
   };
 
