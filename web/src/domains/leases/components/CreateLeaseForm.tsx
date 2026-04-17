@@ -30,7 +30,7 @@ export const CreateLeaseForm = ({
 
   const propertyOptions = [
     { value: '', label: 'Select property…' },
-    ...properties.map((p) => ({ value: p.id, label: p.name ?? p.address })),
+    ...properties.map((p) => ({ value: p.id, label: p.address })),
   ];
   const tenantOptions = [
     { value: '', label: 'Select tenant…' },

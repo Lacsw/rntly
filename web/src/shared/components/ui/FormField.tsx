@@ -25,15 +25,23 @@ export const FormField = (props: TFormFieldProps) => {
       </label>
       {props.type === 'numeric' ? (
         <input
-          type="text"
+          type="number"
           inputMode="numeric"
+          min={0}
+          step={1}
           placeholder={placeholder}
           value={props.value}
           onChange={(e) => {
-            const val = e.target.value.replace(/\D/g, '');
-            props.onChange(val === '' ? 0 : Number(val));
+            const raw = e.target.value;
+            if (raw === '') {
+              props.onChange(0);
+              return;
+            }
+            const parsed = Number(raw);
+            if (Number.isFinite(parsed) && parsed >= 0) props.onChange(parsed);
           }}
           className={inputClass}
+          required={required}
         />
       ) : (
         <input
