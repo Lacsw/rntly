@@ -33,7 +33,13 @@ export const PropertyDetailPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') ?? DEFAULT_TAB;
 
-  const { property, loading: propertyLoading, error: propertyError, refetch } = useProperty(id);
+  const {
+    property,
+    loading: propertyLoading,
+    error: propertyError,
+    notFound: propertyNotFound,
+    refetch,
+  } = useProperty(id);
   const { leases, loading: leasesLoading, error: leasesError } = useLeasesByProperty(id);
   const { tenants, loading: tenantsLoading, error: tenantsError } = useTenants();
   const { updateProperty, deleteProperty, error: propertiesError } = useProperties();
@@ -49,15 +55,19 @@ export const PropertyDetailPage = () => {
 
   if (propertyLoading || leasesLoading || tenantsLoading) return <Loading />;
 
-  if (propertyError) return <ErrorBanner message={propertyError} />;
-
-  if (!property) {
+  if (propertyNotFound) {
     return (
       <EmptyState
         title="Property not found"
-        description="This property may have been deleted."
+        description="This property may have been deleted or the link is incorrect."
       />
     );
+  }
+
+  if (propertyError) return <ErrorBanner message={propertyError} />;
+
+  if (!property) {
+    return <EmptyState title="Property not found" description="This property may have been deleted." />;
   }
 
   const tabs = [
@@ -118,7 +128,7 @@ export const PropertyDetailPage = () => {
       <ConfirmDialog
         open={showDelete}
         title="Delete property"
-        message={`Are you sure you want to delete ${property.name ?? property.address}? This cannot be undone.`}
+        message={`Are you sure you want to delete ${property.address}? This cannot be undone.`}
         confirmLabel="Delete"
         destructive
         onConfirm={async () => {

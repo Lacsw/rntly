@@ -52,6 +52,16 @@ describe('useProperty', () => {
     const { result } = renderHook(() => useProperty('p1'));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch property');
+    expect(result.current.notFound).toBe(false);
+    expect(result.current.property).toBeUndefined();
+  });
+
+  it('sets notFound when backend returns 404', async () => {
+    vi.mocked(propertiesApi.getById).mockRejectedValueOnce({ response: { status: 404 } });
+    const { result } = renderHook(() => useProperty('missing'));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.notFound).toBe(true);
+    expect(result.current.error).toBe('');
     expect(result.current.property).toBeUndefined();
   });
 
