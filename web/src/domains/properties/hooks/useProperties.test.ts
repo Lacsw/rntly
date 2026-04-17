@@ -1,46 +1,23 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/tests/msw/server';
+import { createMockProperty } from '@/tests/msw/factories/property';
 import { useProperties } from './useProperties';
-import { propertiesApi } from '../api';
-import type { TProperty } from '../api';
 
-vi.mock('../api', () => ({
-  propertiesApi: {
-    getAll: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-}));
-
-const mockProperty: TProperty = {
-  id: '1',
-  address: '123 Main St',
-  type: 'apartment',
-  bedrooms: 2,
-  rent_amount: 1500,
-  status: 'available',
-  created_at: '2026-01-01T00:00:00Z',
-  updated_at: '2026-01-01T00:00:00Z',
-};
+const API = 'http://localhost:8080';
 
 describe('useProperties', () => {
-  beforeEach(() => {
-    vi.mocked(propertiesApi.getAll).mockResolvedValue({ data: [mockProperty] } as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('fetches properties on mount and exposes them', async () => {
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.properties).toEqual([mockProperty]);
+    expect(result.current.properties).toEqual([createMockProperty()]);
     expect(result.current.error).toBe('');
   });
 
   it('sets error when the fetch fails', async () => {
-    vi.mocked(propertiesApi.getAll).mockRejectedValueOnce(new Error('net'));
+    server.use(
+      http.get(`${API}/properties`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch properties');
@@ -48,7 +25,18 @@ describe('useProperties', () => {
   });
 
   it('createProperty calls the api and refetches the list', async () => {
-    vi.mocked(propertiesApi.create).mockResolvedValue({ data: mockProperty } as never);
+    let getCount = 0;
+    let postCalled = false;
+    server.use(
+      http.get(`${API}/properties`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockProperty()]);
+      }),
+      http.post(`${API}/properties`, () => {
+        postCalled = true;
+        return HttpResponse.json(createMockProperty({ id: 'p2', address: '456 Oak' }));
+      }),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -61,12 +49,14 @@ describe('useProperties', () => {
       });
     });
 
-    expect(propertiesApi.create).toHaveBeenCalledOnce();
-    expect(propertiesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(postCalled).toBe(true);
+    expect(getCount).toBe(2);
   });
 
   it('sets error when createProperty fails', async () => {
-    vi.mocked(propertiesApi.create).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.post(`${API}/properties`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -83,7 +73,18 @@ describe('useProperties', () => {
   });
 
   it('deleteProperty calls the api with the id and refetches the list', async () => {
-    vi.mocked(propertiesApi.delete).mockResolvedValue({} as never);
+    let getCount = 0;
+    let deletedId: string | null = null;
+    server.use(
+      http.get(`${API}/properties`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockProperty()]);
+      }),
+      http.delete(`${API}/properties/:id`, ({ params }) => {
+        deletedId = String(params.id);
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -91,12 +92,16 @@ describe('useProperties', () => {
       await result.current.deleteProperty('1');
     });
 
-    expect(propertiesApi.delete).toHaveBeenCalledWith('1');
-    expect(propertiesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(deletedId).toBe('1');
+    expect(getCount).toBe(2);
   });
 
   it('sets error when deleteProperty fails', async () => {
-    vi.mocked(propertiesApi.delete).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.delete(`${API}/properties/:id`, () =>
+        HttpResponse.json({ error: 'boom' }, { status: 500 }),
+      ),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -108,7 +113,18 @@ describe('useProperties', () => {
   });
 
   it('updateProperty calls api with id+data and refetches', async () => {
-    vi.mocked(propertiesApi.update).mockResolvedValue({ data: mockProperty } as never);
+    let getCount = 0;
+    let updatedId: string | null = null;
+    server.use(
+      http.get(`${API}/properties`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockProperty()]);
+      }),
+      http.put(`${API}/properties/:id`, ({ params }) => {
+        updatedId = String(params.id);
+        return HttpResponse.json(createMockProperty({ id: updatedId }));
+      }),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -122,12 +138,14 @@ describe('useProperties', () => {
       });
     });
 
-    expect(propertiesApi.update).toHaveBeenCalledWith('1', expect.any(Object));
-    expect(propertiesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(updatedId).toBe('1');
+    expect(getCount).toBe(2);
   });
 
   it('sets error when updateProperty fails', async () => {
-    vi.mocked(propertiesApi.update).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.put(`${API}/properties/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -145,13 +163,16 @@ describe('useProperties', () => {
   });
 
   it('clears a previous error when the next fetch succeeds', async () => {
-    vi.mocked(propertiesApi.getAll).mockRejectedValueOnce(new Error('first fails'));
+    server.use(
+      http.get(`${API}/properties`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
+        once: true,
+      }),
+    );
 
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch properties');
 
-    vi.mocked(propertiesApi.create).mockResolvedValue({ data: mockProperty } as never);
     await act(async () => {
       await result.current.createProperty({
         address: 'X',
