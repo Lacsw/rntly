@@ -61,6 +61,7 @@ describe('useTenants', () => {
 
     expect(postCalled).toBe(true);
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Tenant added');
   });
 
   it('toasts an error when createTenant fails', async () => {
@@ -105,6 +106,7 @@ describe('useTenants', () => {
 
     expect(deletedId).toBe('1');
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Tenant deleted');
   });
 
   it('toasts an error when deleteTenant fails', async () => {

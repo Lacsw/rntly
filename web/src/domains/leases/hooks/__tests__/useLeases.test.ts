@@ -63,6 +63,7 @@ describe('useLeases', () => {
 
     expect(postCalled).toBe(true);
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Lease created');
   });
 
   it('toasts an error when createLease fails', async () => {
@@ -114,6 +115,7 @@ describe('useLeases', () => {
 
     expect(updatedId).toBe('l1');
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Lease updated');
   });
 
   it('toasts an error when updateLease fails', async () => {
@@ -158,6 +160,7 @@ describe('useLeases', () => {
 
     expect(deletedId).toBe('l1');
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Lease deleted');
   });
 
   it('toasts an error when deleteLease fails', async () => {

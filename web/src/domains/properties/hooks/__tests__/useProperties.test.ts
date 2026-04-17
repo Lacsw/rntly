@@ -61,6 +61,7 @@ describe('useProperties', () => {
 
     expect(postCalled).toBe(true);
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Property created');
   });
 
   it('toasts an error when createProperty fails', async () => {
@@ -105,6 +106,7 @@ describe('useProperties', () => {
 
     expect(deletedId).toBe('1');
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Property deleted');
   });
 
   it('toasts an error when deleteProperty fails', async () => {
@@ -151,6 +153,7 @@ describe('useProperties', () => {
 
     expect(updatedId).toBe('1');
     expect(getCount).toBe(2);
+    expect(toast.success).toHaveBeenCalledWith('Property updated');
   });
 
   it('toasts an error when updateProperty fails', async () => {

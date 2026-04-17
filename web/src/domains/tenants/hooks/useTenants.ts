@@ -27,6 +27,7 @@ export const useTenants = () => {
     try {
       await tenantsApi.create(data);
       await fetchTenants();
+      toast.success('Tenant added');
     } catch {
       toast.error('Failed to create tenant');
     }
@@ -36,6 +37,7 @@ export const useTenants = () => {
     try {
       await tenantsApi.delete(id);
       await fetchTenants();
+      toast.success('Tenant deleted');
     } catch {
       toast.error('Failed to delete tenant');
     }

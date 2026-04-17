@@ -27,6 +27,7 @@ export const useLeases = () => {
     try {
       await leasesApi.create(data);
       await fetchLeases();
+      toast.success('Lease created');
     } catch {
       toast.error('Failed to create lease');
     }
@@ -36,6 +37,7 @@ export const useLeases = () => {
     try {
       await leasesApi.update(id, data);
       await fetchLeases();
+      toast.success('Lease updated');
     } catch {
       toast.error('Failed to update lease');
     }
@@ -45,6 +47,7 @@ export const useLeases = () => {
     try {
       await leasesApi.delete(id);
       await fetchLeases();
+      toast.success('Lease deleted');
     } catch {
       toast.error('Failed to delete lease');
     }

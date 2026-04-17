@@ -27,6 +27,7 @@ export const useProperties = () => {
     try {
       await propertiesApi.create(data);
       await fetchProperties();
+      toast.success('Property created');
     } catch {
       toast.error('Failed to create property');
     }
@@ -36,6 +37,7 @@ export const useProperties = () => {
     try {
       await propertiesApi.update(id, data);
       await fetchProperties();
+      toast.success('Property updated');
     } catch {
       toast.error('Failed to update property');
     }
@@ -45,6 +47,7 @@ export const useProperties = () => {
     try {
       await propertiesApi.delete(id);
       await fetchProperties();
+      toast.success('Property deleted');
     } catch {
       toast.error('Failed to delete property');
     }
