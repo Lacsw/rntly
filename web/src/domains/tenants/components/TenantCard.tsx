@@ -64,7 +64,7 @@ export const TenantCard = ({
         {property && (
           <div className="flex items-center gap-2 min-w-0">
             <Home size={14} className="text-stone-400 shrink-0" aria-hidden />
-            <span className="truncate">{property.name ?? property.address}</span>
+            <span className="truncate">{property.address}</span>
           </div>
         )}
       </div>

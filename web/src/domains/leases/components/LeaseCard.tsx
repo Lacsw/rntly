@@ -28,7 +28,7 @@ const STATUS_LABEL: Record<TLeaseDisplayStatus, string> = {
 
 export const LeaseCard = ({ lease, property, tenant }: TLeaseCardProps) => {
   const status = leaseDisplayStatus(lease);
-  const propertyLabel = property ? (property.name ?? property.address) : 'Unknown property';
+  const propertyLabel = property ? property.address : 'Unknown property';
   const tenantLabel = tenant ? `${tenant.first_name} ${tenant.last_name}`.trim() : 'Unknown tenant';
 
   return (

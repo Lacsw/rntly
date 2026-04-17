@@ -61,7 +61,7 @@ export const RecentLeasesSection = ({ leases, properties, tenants }: TRecentLeas
               {leases.map((lease) => {
                 const property = propertyById.get(lease.property_id);
                 const tenant = tenantById.get(lease.tenant_id);
-                const propertyLabel = property ? (property.name ?? property.address) : 'Unknown property';
+                const propertyLabel = property ? property.address : 'Unknown property';
                 const tenantLabel = tenant
                   ? `${tenant.first_name} ${tenant.last_name}`.trim()
                   : 'Unknown tenant';

@@ -24,7 +24,7 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 
 ---
 
-## BUG-001: Property name, city, bathrooms silently dropped by backend
+## BUG-001: Property name, city, bathrooms silently dropped by backend (FIXED in 0ba59a8)
 
 - **Severity:** critical
 - **Surface:** `POST /properties`, FE form `AddPropertyModal`, `PropertyCard`, `PropertyDetailHeader`
@@ -36,11 +36,11 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** Property persists with `name`, `city`, `bathrooms` so the FE can display them
 - **Actual:** BE model (`internal/model/property.go`) has no `Name`, `City`, `Bathrooms` columns. Fields are silently stripped. `PropertyCard` falls back to `property.name ?? property.address` so it renders the address twice and loses user intent entirely.
 - **Notes:** FE types (`web/src/domains/properties/api/types.ts`) declare these as optional. Either extend the BE schema or remove the fields from the FE form.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
-## BUG-002: Modal does not close on Escape key
+## BUG-002: Modal does not close on Escape key (FIXED in 93e6595)
 
 - **Severity:** important
 - **Surface:** `shared/components/ui/Modal` (all modals: Add/Edit Property, Add Tenant, Create Lease, ConfirmDialog)
@@ -50,11 +50,11 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** Modal closes, focus returns to trigger button
 - **Actual:** Modal stays open. Escape does nothing.
 - **Notes:** Backdrop click does close the modal correctly, so only the keyboard path is broken.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
-## BUG-003: Focus not moved into modal on open
+## BUG-003: Focus not moved into modal on open (FIXED in 93e6595)
 
 - **Severity:** important
 - **Surface:** `shared/components/ui/Modal`
@@ -64,11 +64,11 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** Focus moves to first focusable element inside the dialog (e.g., name input or Close button)
 - **Actual:** `document.activeElement === document.body`. Keyboard users cannot tab into the form without first clicking inside.
 - **Notes:** Dialog has `role="dialog"` and `aria-modal="true"` but lacks focus management. Related: no focus trap — Tab can escape back to page content behind the backdrop.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
-## BUG-004: Sidebar missing "Leases" link
+## BUG-004: Sidebar missing "Leases" link (FIXED in f741f96)
 
 - **Severity:** important
 - **Surface:** `shared/components/layout/Sidebar` (or equivalent)
@@ -77,11 +77,11 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** Leases link alongside Properties, Tenants, Contracts, Transactions
 - **Actual:** Sidebar shows Dashboard, Properties, Tenants, Contracts, Transactions, Reports, Settings. `/leases` is reachable only via the Dashboard's "View All" link or direct URL.
 - **Notes:** `/leases` is a real, implemented Scope C page; its absence from nav feels accidental, not intentional.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
-## BUG-005: Property 404 shows generic fetch error, no empty state or back nav
+## BUG-005: Property 404 shows generic fetch error, no empty state or back nav (FIXED in fbeda0b)
 
 - **Severity:** important
 - **Surface:** `pages/PropertyDetailPage`
@@ -90,11 +90,11 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** Dedicated "Property not found" empty state with a button back to `/properties`
 - **Actual:** Bare text "Failed to fetch property" fills `main`. Sidebar still works, but the page has no back link, no title, and no CTA. 404 looks identical to a transient network error.
 - **Notes:** Distinguish HTTP 404 (not found) from HTTP 5xx / network (fetch failed) in `useProperty`.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
-## BUG-006: Numeric inputs use type="text"
+## BUG-006: Numeric inputs use type="text" (FIXED in b5eb69b)
 
 - **Severity:** important
 - **Surface:** `AddPropertyModal` (bedrooms, bathrooms, rent), `CreateLeaseModal` (rent, deposit)
@@ -104,11 +104,11 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** Inputs reject non-numeric characters or show inline validation
 - **Actual:** Inputs accept any string. Form-level validation only checks required status of name/address/city; submit button enables even with gibberish rent. Negative numbers also not blocked.
 - **Notes:** Use `type="number"` with `min={0}` (and `step="1"` for bedrooms) or add Zod-style validators.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
-## BUG-007: PropertyCard renders address twice when name is absent
+## BUG-007: PropertyCard renders address twice when name is absent (FIXED in 0ba59a8)
 
 - **Severity:** minor
 - **Surface:** `domains/properties/components/PropertyCard/PropertyCard.tsx`
@@ -117,7 +117,7 @@ walked per the plan's Task 2–10 checklists. Findings logged as they surfaced.
 - **Expected:** A card with a distinct title and supporting info (e.g., address as subtitle, type + beds + rent)
 - **Actual:** Cards display the address as both the heading and the body text (e.g., "99 QA Lane / 99 QA Lane / 1 bed / 1800"). Caused by the underlying BUG-001 + the fallback `displayName = property.name ?? property.address` being paired with a secondary slot that also renders `property.address`.
 - **Notes:** Fix will likely fall out naturally once BUG-001 is resolved, but worth a direct review of the card layout.
-- **Status:** OPEN
+- **Status:** FIXED
 
 ---
 
@@ -152,6 +152,6 @@ These are expected placeholders per the Scope C spec.
 
 ---
 
-## Next step
+## Status summary
 
-Proceed to Sprint 2 (fix bugs) — 7 bugs filed (1 critical, 5 important, 1 minor).
+All 7 bugs FIXED in Sprint 2. Next step: Sprint 3 (Playwright E2E golden paths).
