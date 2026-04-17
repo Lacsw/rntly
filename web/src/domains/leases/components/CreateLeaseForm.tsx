@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Calendar, DollarSign } from 'lucide-react';
 import { FormField, FormSelect } from '@/shared/components';
 import type { TLeaseCreate } from '../api';
@@ -19,6 +20,8 @@ export const CreateLeaseForm = ({
   onCancel,
 }: TCreateLeaseFormProps) => {
   const { formData, updateField, reset, isValid, errors } = useCreateLeaseForm();
+  const startId = useId();
+  const endId = useId();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,12 +60,16 @@ export const CreateLeaseForm = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1">
+          <label
+            htmlFor={startId}
+            className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1"
+          >
             <Calendar size={14} aria-hidden />
             Start Date
             <span className="text-red-500">*</span>
           </label>
           <input
+            id={startId}
             type="date"
             required
             value={formData.start_date}
@@ -71,12 +78,16 @@ export const CreateLeaseForm = ({
           />
         </div>
         <div>
-          <label className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1">
+          <label
+            htmlFor={endId}
+            className="flex items-center gap-1.5 text-sm font-medium text-stone-700 mb-1"
+          >
             <Calendar size={14} aria-hidden />
             End Date
             <span className="text-red-500">*</span>
           </label>
           <input
+            id={endId}
             type="date"
             required
             value={formData.end_date}
