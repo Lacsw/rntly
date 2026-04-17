@@ -1,44 +1,23 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/tests/msw/server';
+import { createMockTenant } from '@/tests/msw/factories/tenant';
 import { useTenants } from './useTenants';
-import { tenantsApi } from '../api';
-import type { TTenant } from '../api';
 
-vi.mock('../api', () => ({
-  tenantsApi: {
-    getAll: vi.fn(),
-    create: vi.fn(),
-    delete: vi.fn(),
-  },
-}));
-
-const mockTenant: TTenant = {
-  id: '1',
-  first_name: 'Sarah',
-  last_name: 'Johnson',
-  email: 'sarah@example.com',
-  phone: '555-1234',
-  created_at: '2026-01-01T00:00:00Z',
-  updated_at: '2026-01-01T00:00:00Z',
-};
+const API = 'http://localhost:8080';
 
 describe('useTenants', () => {
-  beforeEach(() => {
-    vi.mocked(tenantsApi.getAll).mockResolvedValue({ data: [mockTenant] } as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('fetches tenants on mount and exposes them', async () => {
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.tenants).toEqual([mockTenant]);
+    expect(result.current.tenants).toEqual([createMockTenant()]);
     expect(result.current.error).toBe('');
   });
 
   it('sets error when the fetch fails', async () => {
-    vi.mocked(tenantsApi.getAll).mockRejectedValueOnce(new Error('net'));
+    server.use(
+      http.get(`${API}/tenants`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch tenants');
@@ -46,7 +25,18 @@ describe('useTenants', () => {
   });
 
   it('createTenant calls the api and refetches the list', async () => {
-    vi.mocked(tenantsApi.create).mockResolvedValue({ data: mockTenant } as never);
+    let getCount = 0;
+    let postCalled = false;
+    server.use(
+      http.get(`${API}/tenants`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockTenant()]);
+      }),
+      http.post(`${API}/tenants`, () => {
+        postCalled = true;
+        return HttpResponse.json(createMockTenant({ id: 't2' }));
+      }),
+    );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -59,12 +49,14 @@ describe('useTenants', () => {
       });
     });
 
-    expect(tenantsApi.create).toHaveBeenCalledOnce();
-    expect(tenantsApi.getAll).toHaveBeenCalledTimes(2);
+    expect(postCalled).toBe(true);
+    expect(getCount).toBe(2);
   });
 
   it('sets error when createTenant fails', async () => {
-    vi.mocked(tenantsApi.create).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.post(`${API}/tenants`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -81,7 +73,18 @@ describe('useTenants', () => {
   });
 
   it('deleteTenant calls the api with the id and refetches the list', async () => {
-    vi.mocked(tenantsApi.delete).mockResolvedValue({} as never);
+    let getCount = 0;
+    let deletedId: string | null = null;
+    server.use(
+      http.get(`${API}/tenants`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockTenant()]);
+      }),
+      http.delete(`${API}/tenants/:id`, ({ params }) => {
+        deletedId = String(params.id);
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -89,12 +92,14 @@ describe('useTenants', () => {
       await result.current.deleteTenant('1');
     });
 
-    expect(tenantsApi.delete).toHaveBeenCalledWith('1');
-    expect(tenantsApi.getAll).toHaveBeenCalledTimes(2);
+    expect(deletedId).toBe('1');
+    expect(getCount).toBe(2);
   });
 
   it('sets error when deleteTenant fails', async () => {
-    vi.mocked(tenantsApi.delete).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.delete(`${API}/tenants/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -106,7 +111,11 @@ describe('useTenants', () => {
   });
 
   it('clears a mutation error on the next successful operation', async () => {
-    vi.mocked(tenantsApi.create).mockRejectedValueOnce(new Error('create fails'));
+    server.use(
+      http.post(`${API}/tenants`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
+        once: true,
+      }),
+    );
 
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -121,7 +130,6 @@ describe('useTenants', () => {
     });
     expect(result.current.error).toBe('Failed to create tenant');
 
-    vi.mocked(tenantsApi.create).mockResolvedValue({ data: mockTenant } as never);
     await act(async () => {
       await result.current.createTenant({
         first_name: 'OK',
@@ -134,13 +142,16 @@ describe('useTenants', () => {
   });
 
   it('clears a fetch error when a subsequent mutation triggers a successful refetch', async () => {
-    vi.mocked(tenantsApi.getAll).mockRejectedValueOnce(new Error('first fails'));
+    server.use(
+      http.get(`${API}/tenants`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
+        once: true,
+      }),
+    );
 
     const { result } = renderHook(() => useTenants());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch tenants');
 
-    vi.mocked(tenantsApi.create).mockResolvedValue({ data: mockTenant } as never);
     await act(async () => {
       await result.current.createTenant({
         first_name: 'X',
