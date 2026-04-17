@@ -22,9 +22,17 @@ npm run test:e2e:ui # Playwright UI mode
 
 Type-check without emitting: `npx tsc --noEmit`
 
-Tests use Vitest 4 + @testing-library/react + jsdom. Place tests under a sibling `__tests__/` folder inside each feature dir (e.g. `hooks/__tests__/*.test.ts`). Shared setup lives at `src/tests/setup.ts`. Hook tests that touch axios use MSW — import `server` from `@/tests/msw/server` and override with `server.use(...)` for error branches. Factories at `@/tests/msw/factories/`. Do not `vi.mock` the api layer.
+Tests use Vitest 4 + @testing-library/react + jsdom. Place tests under a sibling `__tests__/` folder inside each feature dir (e.g. `hooks/__tests__/*.test.ts`). Shared setup lives at `src/tests/setup.ts`. Hook tests that touch axios use MSW — import `server` from `@/tests/msw/server` and override with `server.use(...)` for error branches. Factories at `@/tests/msw/factories/`. Do not `vi.mock` the api layer. For hooks that call `toast`, `vi.mock('@/shared/toast', ...)` and assert on `toast.success`/`toast.error`.
 
 DEV builds load `@axe-core/react` (`import.meta.env.DEV` guard in `main.tsx`) — violations print to the browser console. `src/tests/a11y.test.tsx` is an `axe` smoke test that fails the suite if new critical violations land.
+
+Mutation feedback goes through `@/shared/toast` (sonner-backed): success on every create/update/delete, error on any mutation failure. The `error` state on list hooks is for **fetch/bootstrap** errors only — render those inline via `<ErrorBanner>`. Never set mutation errors to hook state.
+
+Deletes are **optimistic**: the item is removed from local state before the API call; on failure, the hook restores the snapshot and toasts the error. No refetch on delete success.
+
+Loading states: list pages render domain skeleton cards (e.g. `PropertyCardSkeleton`) during initial fetch, not `<Loading />`. Dashboard uses `StatCardSkeleton` + generic `<Skeleton>` blocks.
+
+Form validation: inline per-field errors live on the hook as `errors: { field?: string }`. Pass into `FormField`/`FormSelect` via the `error` prop, which wires `aria-invalid` + `aria-describedby` automatically.
 
 Backend (from repo root `/Users/romanfrolov/dev/rntly/`):
 ```bash

@@ -36,6 +36,13 @@ paths:
 - **Live regions**: spinners/status get `role="status"` + `aria-live="polite"`. Errors get `role="alert"`.
 - **Heading order**: one `<h1>` per page (via `PageHeader`); sections `<h2>`; cards `<h3>`. Never skip levels.
 
+## Feedback + forms patterns (adopted Sprint 7)
+- **Mutations → toasts**: every create/update/delete calls `toast.success(...)` on happy path and `toast.error(...)` on failure. Import from `@/shared/toast`. Don't render mutation errors as inline banners.
+- **Fetch errors → banners**: only bootstrap/list-fetch failures set the hook's `error` state; pages render `<ErrorBanner>` from that.
+- **Optimistic deletes**: snapshot → filter locally → await api → revert snapshot + toast on error. No post-success refetch.
+- **Skeletons**: list pages render domain skeleton cards (`PropertyCardSkeleton`, `TenantCardSkeleton`, `LeaseCardSkeleton`) during initial loading, not `<Loading />`. Count = 6 per grid. Dashboard uses `StatCardSkeleton` + `<Skeleton>` blocks.
+- **Inline validation**: form hooks expose `errors: { field?: string }`. Pass into `FormField` / `FormSelect` via `error={errors.field}` — the component wires `aria-invalid` + `aria-describedby` and renders the message.
+
 ## Avoid
 - `data-testid` attributes — use semantic HTML and ARIA roles instead
 - Prop drilling more than 2 levels — extract to context or composition
