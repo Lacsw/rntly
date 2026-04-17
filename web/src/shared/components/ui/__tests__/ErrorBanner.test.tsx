@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ErrorBanner } from './ErrorBanner';
+import { ErrorBanner } from '../ErrorBanner';
 
 describe('ErrorBanner', () => {
   it('renders the message', () => {

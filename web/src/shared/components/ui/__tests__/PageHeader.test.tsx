@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { PageHeader } from './PageHeader';
+import { PageHeader } from '../PageHeader';
 
 const wrap = (ui: ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
