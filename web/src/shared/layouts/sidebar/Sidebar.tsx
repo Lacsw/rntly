@@ -30,8 +30,12 @@ const Sidebar = () => {
             <span className="text-xs text-stone-500">roman@rntly.app</span>
           </div>
         </div>
-        <button className="text-stone-400 hover:text-stone-600 cursor-pointer">
-          <LogOut className="w-4 h-4" />
+        <button
+          type="button"
+          aria-label="Log out"
+          className="text-stone-400 hover:text-stone-600 cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" aria-hidden />
         </button>
       </div>
     </aside>
