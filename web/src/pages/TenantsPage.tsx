@@ -4,6 +4,7 @@ import {
   useTenants,
   useTenantStats,
   TenantCard,
+  TenantCardSkeleton,
   CreateTenantForm,
   TenantStatCards,
 } from '../domains/tenants';
@@ -12,10 +13,11 @@ import { useProperties } from '../domains/properties';
 import {
   Modal,
   PageHeader,
-  Loading,
   ErrorBanner,
   EmptyState,
 } from '@/shared/components';
+
+const SKELETON_COUNT = 6;
 
 export const TenantsPage = () => {
   const { tenants, loading: tenantsLoading, error, createTenant } = useTenants();
@@ -42,7 +44,7 @@ export const TenantsPage = () => {
     return map;
   }, [leases]);
 
-  if (tenantsLoading || leasesLoading || propsLoading) return <Loading />;
+  const loading = tenantsLoading || leasesLoading || propsLoading;
 
   return (
     <div>
@@ -51,6 +53,7 @@ export const TenantsPage = () => {
         subtitle="Manage tenant information and payment history"
         actions={
           <button
+            type="button"
             onClick={() => setShowForm(true)}
             className="bg-stone-900 text-white px-4 py-2 rounded hover:bg-stone-800 flex items-center gap-2"
           >
@@ -75,7 +78,13 @@ export const TenantsPage = () => {
         <CreateTenantForm onSubmit={createTenant} onCancel={() => setShowForm(false)} />
       </Modal>
 
-      {tenants.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <TenantCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : tenants.length === 0 ? (
         <EmptyState
           title="No tenants yet"
           description="Add your first tenant to get started."

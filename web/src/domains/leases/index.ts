@@ -7,5 +7,6 @@ export { useCreateLeaseForm } from './hooks/useCreateLeaseForm';
 export { isActiveLease, leaseDisplayStatus } from './utils/lease';
 export type { TLeaseDisplayStatus } from './utils/lease';
 export { LeaseCard } from './components/LeaseCard';
+export { LeaseCardSkeleton } from './components/LeaseCardSkeleton';
 export { CreateLeaseForm } from './components/CreateLeaseForm';
 export { LeaseStatCards } from './components/LeaseStatCards';

@@ -4,6 +4,7 @@ import {
   useLeases,
   useLeaseStats,
   LeaseCard,
+  LeaseCardSkeleton,
   CreateLeaseForm,
   LeaseStatCards,
 } from '../domains/leases';
@@ -12,10 +13,11 @@ import { useTenants } from '../domains/tenants';
 import {
   Modal,
   PageHeader,
-  Loading,
   ErrorBanner,
   EmptyState,
 } from '@/shared/components';
+
+const SKELETON_COUNT = 6;
 
 export const LeasesPage = () => {
   const { leases, loading: leasesLoading, error: leasesError, createLease } = useLeases();
@@ -36,7 +38,7 @@ export const LeasesPage = () => {
     return map;
   }, [tenants]);
 
-  if (leasesLoading || propsLoading || tenantsLoading) return <Loading />;
+  const loading = leasesLoading || propsLoading || tenantsLoading;
 
   return (
     <div>
@@ -45,6 +47,7 @@ export const LeasesPage = () => {
         subtitle="Track lease agreements between tenants and properties"
         actions={
           <button
+            type="button"
             onClick={() => setShowForm(true)}
             className="bg-stone-900 text-white px-4 py-2 rounded hover:bg-stone-800 flex items-center gap-2"
           >
@@ -72,7 +75,13 @@ export const LeasesPage = () => {
         />
       </Modal>
 
-      {leases.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <LeaseCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : leases.length === 0 ? (
         <EmptyState
           title="No leases yet"
           description="Create your first lease agreement to get started."

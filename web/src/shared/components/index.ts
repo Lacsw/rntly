@@ -9,3 +9,4 @@ export { Modal } from './ui/Modal';
 export { StatusBadge } from './ui/StatusBadge';
 export { FormField } from './ui/FormField';
 export { FormSelect } from './ui/FormSelect';
+export { Skeleton } from './ui/Skeleton';
