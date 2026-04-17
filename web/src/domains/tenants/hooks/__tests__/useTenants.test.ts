@@ -2,7 +2,7 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/msw/server';
 import { createMockTenant } from '@/tests/msw/factories/tenant';
-import { useTenants } from './useTenants';
+import { useTenants } from '../useTenants';
 
 const API = 'http://localhost:8080';
 

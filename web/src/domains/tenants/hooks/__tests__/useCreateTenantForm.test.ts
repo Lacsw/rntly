@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCreateTenantForm } from './useCreateTenantForm';
+import { useCreateTenantForm } from '../useCreateTenantForm';
 
 describe('useCreateTenantForm', () => {
   it('starts with empty fields and isValid false', () => {

@@ -1,5 +1,5 @@
-import { fullName, isActiveTenant, paymentRateLabel } from './tenant';
-import type { TTenant } from '../api';
+import { fullName, isActiveTenant, paymentRateLabel } from '../tenant';
+import type { TTenant } from '../../api';
 import type { TLease } from '@/domains/leases';
 
 const tenant: TTenant = {
