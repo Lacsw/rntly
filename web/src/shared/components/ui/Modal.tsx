@@ -21,8 +21,35 @@ export const Modal = ({ open, onClose, title, icon, children }: TModalProps) => 
 
   useEffect(() => {
     if (!open) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      );
+      if (focusable.length === 0) {
+        e.preventDefault();
+        dialog.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const current = document.activeElement as HTMLElement | null;
+
+      if (e.shiftKey && (current === first || !dialog.contains(current))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (current === last || !dialog.contains(current))) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);

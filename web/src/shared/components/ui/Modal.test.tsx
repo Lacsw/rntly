@@ -59,4 +59,34 @@ describe('Modal', () => {
     );
     expect(document.activeElement).toBe(screen.getByPlaceholderText('first'));
   });
+
+  it('traps Tab from the last focusable back to the first', async () => {
+    render(
+      <Modal {...baseProps}>
+        <input placeholder="first" />
+        <input placeholder="second" />
+      </Modal>,
+    );
+    const second = screen.getByPlaceholderText('second');
+    const closeButton = screen.getByRole('button', { name: 'Close dialog' });
+    // Close button is the first focusable (rendered before the body),
+    // so last focusable is `second`. Focus it and Tab forward.
+    second.focus();
+    await userEvent.tab();
+    expect(document.activeElement).toBe(closeButton);
+  });
+
+  it('traps Shift+Tab from the first focusable back to the last', async () => {
+    render(
+      <Modal {...baseProps}>
+        <input placeholder="first" />
+        <input placeholder="second" />
+      </Modal>,
+    );
+    const second = screen.getByPlaceholderText('second');
+    const closeButton = screen.getByRole('button', { name: 'Close dialog' });
+    closeButton.focus();
+    await userEvent.tab({ shift: true });
+    expect(document.activeElement).toBe(second);
+  });
 });
