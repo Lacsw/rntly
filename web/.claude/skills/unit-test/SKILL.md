@@ -62,65 +62,43 @@ describe("calculateTotal", () => {
 });
 ```
 
-## Hook Test
+## Hook Test (MSW)
+
+Hook tests that touch `axios` use MSW handlers — never `vi.mock('../api', ...)`. MSW intercepts at the network layer so axios code paths (interceptors, error shape, status branches) run for real. Default handlers live in `web/src/tests/msw/handlers.ts`; override per test via `server.use(...)`.
 
 ```tsx
 // web/src/domains/properties/hooks/useProperties.test.ts
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/tests/msw/server';
+import { createMockProperty } from '@/tests/msw/factories/property';
 import { useProperties } from './useProperties';
-import { propertiesApi } from '../api';
-import type { TProperty } from '../api';
 
-vi.mock('../api', () => ({
-  propertiesApi: {
-    getAll: vi.fn(),
-    create: vi.fn(),
-    delete: vi.fn(),
-  },
-}));
-
-const mockProperty: TProperty = {
-  id: '1',
-  address: '123 Main St',
-  type: 'apartment',
-  bedrooms: 2,
-  rent_amount: 1500,
-  status: 'vacant',
-  created_at: '',
-  updated_at: '',
-};
+const API = 'http://localhost:8080';
 
 describe('useProperties', () => {
-  beforeEach(() => {
-    vi.mocked(propertiesApi.getAll).mockResolvedValue({ data: [mockProperty] } as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('fetches on mount', async () => {
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.properties).toEqual([mockProperty]);
+    expect(result.current.properties).toEqual([createMockProperty()]);
   });
 
-  it('createProperty calls api and refetches', async () => {
-    vi.mocked(propertiesApi.create).mockResolvedValue({ data: mockProperty } as never);
+  it('sets error when fetch fails', async () => {
+    server.use(
+      http.get(`${API}/properties`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useProperties());
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    await act(async () => {
-      await result.current.createProperty({ address: '456', type: 'house', bedrooms: 3, rent_amount: 2000 });
-    });
-
-    expect(propertiesApi.create).toHaveBeenCalledOnce();
-    expect(propertiesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(result.current.error).toBe('Failed to fetch properties');
   });
 });
 ```
 
-Note: once Sprint 4 lands MSW, replace `vi.mock('../api', ...)` with `server.use(http.get(...))` handlers for realistic HTTP paths including axios error shapes.
+**Conventions:**
+- Setup runs `server.listen({ onUnhandledRequest: 'error' })` in `src/tests/setup.ts` — any endpoint the hook hits must be declared in a handler or the test fails loudly.
+- Reset between tests is automatic via `afterEach(() => server.resetHandlers())`.
+- Use `http.get(..., resolver, { once: true })` when you need a transient error handler to fall back to the default on the next call.
+- Factories live at `web/src/tests/msw/factories/{property,tenant,lease}.ts` — import with `@/tests/msw/factories/<name>`.
 
 ## Component Test
 
@@ -168,10 +146,10 @@ describe("ResourceCard", () => {
 
 ## Mock Factory Pattern
 
-Use mock factories from `web/src/tests/factories/` for reusable test data. Create factories that accept overrides via the spread operator:
+Mock factories live at `web/src/tests/msw/factories/` — one per domain entity. Each accepts `Partial<T>` overrides via spread:
 
 ```tsx
-// web/src/tests/factories/property.ts
+// web/src/tests/msw/factories/property.ts
 import type { TProperty } from '@/domains/properties';
 
 export const createMockProperty = (overrides: Partial<TProperty> = {}): TProperty => ({
@@ -180,33 +158,24 @@ export const createMockProperty = (overrides: Partial<TProperty> = {}): TPropert
   type: 'apartment',
   bedrooms: 2,
   rent_amount: 1500,
-  status: 'vacant',
+  status: 'available',
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
   ...overrides,
 });
 ```
 
-Usage in tests:
+Usage:
 
 ```tsx
-import { createMockProperty } from "@/tests/factories";
+import { createMockProperty } from '@/tests/msw/factories/property';
 
-describe("PropertyCard", () => {
-  it("should display property address", () => {
-    const property = createMockProperty({ address: "456 Oak Ave" });
-    render(<PropertyCard property={property} />);
-    expect(screen.getByText("456 Oak Ave")).toBeInTheDocument();
-  });
-
-  it("should handle house property type", () => {
-    const property = createMockProperty({ type: "house" });
-    // ...
-  });
-});
+const property = createMockProperty({ address: '456 Oak Ave' });
+render(<PropertyCard property={property} />);
+expect(screen.getByText('456 Oak Ave')).toBeInTheDocument();
 ```
 
-Store new factories in `web/src/tests/factories/` and export them from `tests/factories/index.ts`.
+New domain? Add `web/src/tests/msw/factories/<entity>.ts` and wire it into the default handlers in `web/src/tests/msw/handlers.ts`.
 
 ## Common Mocks
 

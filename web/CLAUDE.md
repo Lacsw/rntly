@@ -22,7 +22,7 @@ npm run test:e2e:ui # Playwright UI mode
 
 Type-check without emitting: `npx tsc --noEmit`
 
-Tests use Vitest 4 + @testing-library/react + jsdom. Co-locate tests as `*.test.ts(x)` next to the source file. Shared setup lives at `src/tests/setup.ts`.
+Tests use Vitest 4 + @testing-library/react + jsdom. Co-locate tests as `*.test.ts(x)` next to the source file. Shared setup lives at `src/tests/setup.ts`. Hook tests that touch axios use MSW — import `server` from `@/tests/msw/server` and override with `server.use(...)` for error branches. Factories at `@/tests/msw/factories/`. Do not `vi.mock` the api layer.
 
 Backend (from repo root `/Users/romanfrolov/dev/rntly/`):
 ```bash
