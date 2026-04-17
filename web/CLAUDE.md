@@ -16,6 +16,8 @@ npm run preview    # Preview production build
 npm test           # Run the test suite once
 npm run test:watch # Run the tests in watch mode
 npm run coverage   # Run tests with coverage report
+npm run test:e2e   # Playwright E2E (requires BE on :8080 and FE on :5173)
+npm run test:e2e:ui # Playwright UI mode
 ```
 
 Type-check without emitting: `npx tsc --noEmit`
