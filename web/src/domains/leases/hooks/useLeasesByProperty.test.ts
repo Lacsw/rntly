@@ -1,56 +1,50 @@
 import { renderHook, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/tests/msw/server';
+import { createMockLease } from '@/tests/msw/factories/lease';
 import { useLeasesByProperty } from './useLeasesByProperty';
-import { leasesApi } from '../api';
-import type { TLease } from '../api';
 
-vi.mock('../api', () => ({
-  leasesApi: {
-    listByProperty: vi.fn(),
-  },
-}));
-
-const mockLease: TLease = {
-  id: 'l1',
-  property_id: 'p1',
-  tenant_id: 't1',
-  start_date: '2026-01-01T00:00:00Z',
-  end_date: '2027-01-01T00:00:00Z',
-  rent_amount: 1850,
-  deposit: 1850,
-  status: 'active',
-  created_at: '',
-  updated_at: '',
-};
+const API = 'http://localhost:8080';
 
 describe('useLeasesByProperty', () => {
-  beforeEach(() => {
-    vi.mocked(leasesApi.listByProperty).mockResolvedValue({ data: [mockLease] } as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('fetches leases for the given property id', async () => {
+    const seen: string[] = [];
+    server.use(
+      http.get(`${API}/properties/:propertyId/leases`, ({ params }) => {
+        seen.push(String(params.propertyId));
+        return HttpResponse.json([createMockLease({ property_id: String(params.propertyId) })]);
+      }),
+    );
     const { result } = renderHook(() => useLeasesByProperty('p1'));
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(leasesApi.listByProperty).toHaveBeenCalledWith('p1');
-    expect(result.current.leases).toEqual([mockLease]);
+    expect(seen).toEqual(['p1']);
+    expect(result.current.leases).toEqual([createMockLease({ property_id: 'p1' })]);
     expect(result.current.error).toBe('');
   });
 
   it('refetches when propertyId changes', async () => {
+    const seen: string[] = [];
+    server.use(
+      http.get(`${API}/properties/:propertyId/leases`, ({ params }) => {
+        seen.push(String(params.propertyId));
+        return HttpResponse.json([]);
+      }),
+    );
     const { result, rerender } = renderHook(({ id }) => useLeasesByProperty(id), {
       initialProps: { id: 'p1' },
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     rerender({ id: 'p2' });
-    await waitFor(() => expect(leasesApi.listByProperty).toHaveBeenCalledWith('p2'));
+    await waitFor(() => expect(seen).toContain('p2'));
   });
 
   it('sets error when fetch fails', async () => {
-    vi.mocked(leasesApi.listByProperty).mockRejectedValueOnce(new Error('net'));
+    server.use(
+      http.get(`${API}/properties/:propertyId/leases`, () =>
+        HttpResponse.json({ error: 'boom' }, { status: 500 }),
+      ),
+    );
     const { result } = renderHook(() => useLeasesByProperty('p1'));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch leases');
@@ -58,9 +52,16 @@ describe('useLeasesByProperty', () => {
   });
 
   it('does not fetch when propertyId is empty', async () => {
+    let hit = false;
+    server.use(
+      http.get(`${API}/properties/:propertyId/leases`, () => {
+        hit = true;
+        return HttpResponse.json([]);
+      }),
+    );
     const { result } = renderHook(() => useLeasesByProperty(''));
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(leasesApi.listByProperty).not.toHaveBeenCalled();
+    expect(hit).toBe(false);
     expect(result.current.leases).toEqual([]);
   });
 });

@@ -1,48 +1,23 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/tests/msw/server';
+import { createMockLease } from '@/tests/msw/factories/lease';
 import { useLeases } from './useLeases';
-import { leasesApi } from '../api';
-import type { TLease } from '../api';
 
-vi.mock('../api', () => ({
-  leasesApi: {
-    getAll: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-}));
-
-const mockLease: TLease = {
-  id: 'l1',
-  property_id: 'p1',
-  tenant_id: 't1',
-  start_date: '2026-01-01T00:00:00Z',
-  end_date: '2027-01-01T00:00:00Z',
-  rent_amount: 1850,
-  deposit: 1850,
-  status: 'active',
-  created_at: '2026-01-01T00:00:00Z',
-  updated_at: '2026-01-01T00:00:00Z',
-};
+const API = 'http://localhost:8080';
 
 describe('useLeases', () => {
-  beforeEach(() => {
-    vi.mocked(leasesApi.getAll).mockResolvedValue({ data: [mockLease] } as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('fetches leases on mount', async () => {
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.leases).toEqual([mockLease]);
+    expect(result.current.leases).toEqual([createMockLease()]);
     expect(result.current.error).toBe('');
   });
 
   it('sets error when fetch fails', async () => {
-    vi.mocked(leasesApi.getAll).mockRejectedValueOnce(new Error('net'));
+    server.use(
+      http.get(`${API}/leases`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Failed to fetch leases');
@@ -50,7 +25,18 @@ describe('useLeases', () => {
   });
 
   it('createLease calls api and refetches', async () => {
-    vi.mocked(leasesApi.create).mockResolvedValue({ data: mockLease } as never);
+    let getCount = 0;
+    let postCalled = false;
+    server.use(
+      http.get(`${API}/leases`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockLease()]);
+      }),
+      http.post(`${API}/leases`, () => {
+        postCalled = true;
+        return HttpResponse.json(createMockLease({ id: 'l2' }));
+      }),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -65,12 +51,14 @@ describe('useLeases', () => {
       });
     });
 
-    expect(leasesApi.create).toHaveBeenCalledOnce();
-    expect(leasesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(postCalled).toBe(true);
+    expect(getCount).toBe(2);
   });
 
   it('sets error when createLease fails', async () => {
-    vi.mocked(leasesApi.create).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.post(`${API}/leases`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -89,7 +77,18 @@ describe('useLeases', () => {
   });
 
   it('updateLease calls api with id and data, then refetches', async () => {
-    vi.mocked(leasesApi.update).mockResolvedValue({ data: mockLease } as never);
+    let getCount = 0;
+    let updatedId: string | null = null;
+    server.use(
+      http.get(`${API}/leases`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockLease()]);
+      }),
+      http.put(`${API}/leases/:id`, ({ params }) => {
+        updatedId = String(params.id);
+        return HttpResponse.json(createMockLease({ id: updatedId }));
+      }),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -103,12 +102,14 @@ describe('useLeases', () => {
       });
     });
 
-    expect(leasesApi.update).toHaveBeenCalledWith('l1', expect.any(Object));
-    expect(leasesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(updatedId).toBe('l1');
+    expect(getCount).toBe(2);
   });
 
   it('sets error when updateLease fails', async () => {
-    vi.mocked(leasesApi.update).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.put(`${API}/leases/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -126,7 +127,18 @@ describe('useLeases', () => {
   });
 
   it('deleteLease calls api with id and refetches', async () => {
-    vi.mocked(leasesApi.delete).mockResolvedValue({} as never);
+    let getCount = 0;
+    let deletedId: string | null = null;
+    server.use(
+      http.get(`${API}/leases`, () => {
+        getCount += 1;
+        return HttpResponse.json([createMockLease()]);
+      }),
+      http.delete(`${API}/leases/:id`, ({ params }) => {
+        deletedId = String(params.id);
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -134,12 +146,14 @@ describe('useLeases', () => {
       await result.current.deleteLease('l1');
     });
 
-    expect(leasesApi.delete).toHaveBeenCalledWith('l1');
-    expect(leasesApi.getAll).toHaveBeenCalledTimes(2);
+    expect(deletedId).toBe('l1');
+    expect(getCount).toBe(2);
   });
 
   it('sets error when deleteLease fails', async () => {
-    vi.mocked(leasesApi.delete).mockRejectedValue(new Error('boom'));
+    server.use(
+      http.delete(`${API}/leases/:id`, () => HttpResponse.json({ error: 'boom' }, { status: 500 })),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -151,7 +165,11 @@ describe('useLeases', () => {
   });
 
   it('clears a mutation error on the next successful operation', async () => {
-    vi.mocked(leasesApi.create).mockRejectedValueOnce(new Error('create fails'));
+    server.use(
+      http.post(`${API}/leases`, () => HttpResponse.json({ error: 'boom' }, { status: 500 }), {
+        once: true,
+      }),
+    );
     const { result } = renderHook(() => useLeases());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -167,7 +185,6 @@ describe('useLeases', () => {
     });
     expect(result.current.error).toBe('Failed to create lease');
 
-    vi.mocked(leasesApi.create).mockResolvedValue({ data: mockLease } as never);
     await act(async () => {
       await result.current.createLease({
         property_id: 'p2',
