@@ -7,17 +7,21 @@ description: Create unit tests using Vitest and Testing Library. Use when writin
 
 ## Test Location
 
-Place tests co-located next to the source file:
+Place tests in a sibling `__tests__/` folder inside each feature dir:
 
 ```
 domain/
 ├── utils/
 │   ├── helpers.ts
-│   └── helpers.test.ts
+│   └── __tests__/
+│       └── helpers.test.ts
 ├── hooks/
 │   ├── useResource.ts
-│   └── useResource.test.ts
+│   └── __tests__/
+│       └── useResource.test.ts
 ```
+
+Test file basename matches the source (`useResource.ts` → `useResource.test.ts`).
 
 ## Running Tests
 
@@ -30,10 +34,10 @@ npm test path/to/file.test   # Specific file
 ## Utility Function Test
 
 ```tsx
-// utils/helpers.test.ts
+// utils/__tests__/helpers.test.ts
 import { describe, it, expect } from "vitest";
 
-import { formatCurrency, calculateTotal } from "./helpers";
+import { formatCurrency, calculateTotal } from "../helpers";
 
 describe("formatCurrency", () => {
   it("should format number as EUR currency", () => {
@@ -67,12 +71,12 @@ describe("calculateTotal", () => {
 Hook tests that touch `axios` use MSW handlers — never `vi.mock('../api', ...)`. MSW intercepts at the network layer so axios code paths (interceptors, error shape, status branches) run for real. Default handlers live in `web/src/tests/msw/handlers.ts`; override per test via `server.use(...)`.
 
 ```tsx
-// web/src/domains/properties/hooks/useProperties.test.ts
+// web/src/domains/properties/hooks/__tests__/useProperties.test.ts
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/msw/server';
 import { createMockProperty } from '@/tests/msw/factories/property';
-import { useProperties } from './useProperties';
+import { useProperties } from '../useProperties';
 
 const API = 'http://localhost:8080';
 
@@ -103,12 +107,12 @@ describe('useProperties', () => {
 ## Component Test
 
 ```tsx
-// components/ResourceCard.test.tsx
+// components/__tests__/ResourceCard.test.tsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { ResourceCard } from "./ResourceCard";
+import { ResourceCard } from "../ResourceCard";
 
 describe("ResourceCard", () => {
   const defaultProps = {

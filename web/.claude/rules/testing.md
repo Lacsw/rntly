@@ -11,14 +11,14 @@ paths:
 - Skip framework boilerplate and simple re-exports
 
 ## Test Structure
-- Tests live co-located next to source as `foo.test.ts` or `foo.test.tsx`
+- Tests live in a sibling `__tests__/` folder inside each feature dir (e.g. `hooks/__tests__/useProperties.test.ts`). Test files use the same basename as the source file plus `.test.ts(x)`.
 - Use `.test.ts` or `.test.tsx` extension
 - Use `describe` for grouping, `it` for individual tests
 
 ## Mock Factories
 - Extract common test data to shared constants (`BASE_USER`, `BASE_PROPERTY`)
 - Create mock factories: `createMockProperty(overrides)`
-- Store factories in `web/src/tests/factories/`
+- Store factories in `web/src/tests/msw/factories/`
 - Use spread operator for test variations
 
 ## Vitest Patterns
