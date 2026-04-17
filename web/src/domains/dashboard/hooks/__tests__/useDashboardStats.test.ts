@@ -4,7 +4,7 @@ import { server } from '@/tests/msw/server';
 import { createMockProperty } from '@/tests/msw/factories/property';
 import { createMockTenant } from '@/tests/msw/factories/tenant';
 import { createMockLease } from '@/tests/msw/factories/lease';
-import { useDashboardStats } from './useDashboardStats';
+import { useDashboardStats } from '../useDashboardStats';
 
 const API = 'http://localhost:8080';
 
