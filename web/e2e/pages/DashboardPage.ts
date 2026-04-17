@@ -7,7 +7,7 @@ export class DashboardPage extends BasePage {
   }
 
   statTile(label: string) {
-    return this.page.getByText(label, { exact: true });
+    return this.page.getByRole('main').getByText(label, { exact: true }).first();
   }
 
   yourPropertiesSection() {
