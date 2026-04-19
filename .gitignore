@@ -26,5 +26,6 @@ coverage.out
 !.claude/skills/
 !.claude/rules/
 
-# Internal planning docs (kept local, not shared publicly)
+# Internal planning and QA docs (kept local, not shared publicly)
 docs/superpowers/
+docs/qa/
