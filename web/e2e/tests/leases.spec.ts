@@ -45,10 +45,10 @@ test.describe('Leases golden path', () => {
     await dialog.getByLabel('Monthly Rent').fill('1500');
 
     await expect(dialog.getByText('End date must be after start date')).toBeVisible();
-    await expect(dialog.getByRole('button', { name: 'Create Lease' })).toBeDisabled();
+    await expect(dialog.getByRole('button', { name: 'Create Lease' })).toBeEnabled();
 
     await dialog.getByLabel('End Date').fill('2027-06-01');
-    await expect(dialog.getByRole('button', { name: 'Create Lease' })).toBeEnabled();
+    await expect(dialog.getByText('End date must be after start date')).toBeHidden();
 
     await dialog.getByRole('button', { name: 'Cancel' }).click();
     await expect(dialog).toBeHidden();

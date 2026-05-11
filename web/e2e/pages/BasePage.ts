@@ -22,4 +22,18 @@ export class BasePage {
   link(name: string | RegExp) {
     return this.page.getByRole('link', { name });
   }
+
+  async mockApiError(path: string, status: number) {
+    await this.page.route(`http://localhost:8080${path}`, (route) =>
+      route.fulfill({ status, body: JSON.stringify({ error: 'forced error' }) }),
+    );
+  }
+
+  async mockApiErrorOnce(path: string, status: number) {
+    await this.page.route(
+      `http://localhost:8080${path}`,
+      (route) => route.fulfill({ status, body: JSON.stringify({ error: 'forced error' }) }),
+      { times: 1 },
+    );
+  }
 }

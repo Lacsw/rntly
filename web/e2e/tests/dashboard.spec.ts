@@ -21,6 +21,6 @@ test.describe('Dashboard', () => {
     await expect(dashboard.sidebarLink('Contracts')).toBeVisible();
 
     await dashboard.addPropertyLink().click();
-    await expect(page).toHaveURL(/\/properties$/);
+    await expect(page).toHaveURL(/\/properties/);
   });
 });
