@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, MoreVertical, Trash2 } from 'lucide-react';
 import type { TProperty } from '../../api';
@@ -16,6 +16,25 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const menuId = useId();
+  const menuContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleMouseDown = (e: MouseEvent) => {
+      if (menuContainerRef.current && !menuContainerRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [menuOpen]);
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -25,7 +44,7 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-stone-100 relative">
       {onDelete && (
-        <div className="absolute top-2 right-2 z-10" onClick={stopPropagation}>
+        <div className="absolute top-2 right-2 z-10" ref={menuContainerRef} onClick={stopPropagation}>
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
