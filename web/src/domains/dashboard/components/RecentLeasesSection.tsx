@@ -50,11 +50,11 @@ export const RecentLeasesSection = ({ leases, properties, tenants }: TRecentLeas
           <table className="w-full">
             <thead className="bg-stone-50 text-xs text-stone-500">
               <tr>
-                <th className="text-left px-4 py-3 font-medium">Property</th>
-                <th className="text-left px-4 py-3 font-medium">Tenant</th>
-                <th className="text-left px-4 py-3 font-medium">Start</th>
-                <th className="text-left px-4 py-3 font-medium">Rent</th>
-                <th className="text-left px-4 py-3 font-medium">Status</th>
+                <th scope="col" className="text-left px-4 py-3 font-medium">Property</th>
+                <th scope="col" className="text-left px-4 py-3 font-medium">Tenant</th>
+                <th scope="col" className="text-left px-4 py-3 font-medium">Start</th>
+                <th scope="col" className="text-left px-4 py-3 font-medium">Rent</th>
+                <th scope="col" className="text-left px-4 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
