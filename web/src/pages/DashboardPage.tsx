@@ -30,7 +30,7 @@ export const DashboardPage = () => {
         actions={
           <Link
             to="/properties?create=1"
-            className="bg-stone-900 text-white px-4 py-2 rounded hover:bg-stone-800 flex items-center gap-2"
+            className="bg-stone-900 text-white px-4 py-2 rounded hover:bg-stone-800 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-1"
           >
             <Plus size={18} aria-hidden />
             Add Property

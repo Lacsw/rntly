@@ -83,10 +83,10 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
         <PropertyCardImage property={property} hasActions={!!onDelete} />
 
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-stone-900 flex items-center gap-1">
+          <h2 className="text-lg font-semibold text-stone-900 flex items-center gap-1">
             <MapPin className="w-4 h-4 text-stone-500" aria-hidden />
             <span>{property.address}</span>
-          </h3>
+          </h2>
 
           <PropertyCardStats property={property} />
 

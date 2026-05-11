@@ -47,7 +47,7 @@ export const TenantCard = ({
           {initials(tenant.first_name, tenant.last_name)}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-stone-900 truncate">{fullName(tenant)}</h3>
+          <h2 className="font-semibold text-stone-900 truncate">{fullName(tenant)}</h2>
           <StatusBadge status={statusLabel} variant={statusVariant} />
         </div>
       </div>

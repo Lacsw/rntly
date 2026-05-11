@@ -37,7 +37,7 @@ export const PropertiesPage = () => {
           <button
             type="button"
             onClick={openForm}
-            className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800 flex items-center gap-2"
+            className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-1"
           >
             <Plus size={18} aria-hidden />
             Add Property

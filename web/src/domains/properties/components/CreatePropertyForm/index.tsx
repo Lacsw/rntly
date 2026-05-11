@@ -77,7 +77,7 @@ export const CreatePropertyForm = ({ onSubmit, onCancel }: TCreatePropertyFormPr
         </button>
         <button
           type="submit"
-          className="bg-stone-900 text-white rounded-lg py-3 hover:bg-stone-800"
+          className="bg-stone-900 text-white rounded-lg py-3 hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-1"
         >
           Add Property
         </button>
