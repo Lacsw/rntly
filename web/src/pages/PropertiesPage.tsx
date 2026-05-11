@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import {
@@ -12,6 +12,7 @@ import {
   PageHeader,
   ErrorBanner,
   EmptyState,
+  SearchBar,
 } from '@/shared/components';
 import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
@@ -19,9 +20,29 @@ const SKELETON_COUNT = 6;
 
 export const PropertiesPage = () => {
   const { properties, loading, error, createProperty, deleteProperty } = useProperties();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(() => searchParams.get('create') === '1');
+
+  const query = searchParams.get('q') ?? '';
+
+  const setQuery = (value: string) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value) next.set('q', value);
+        else next.delete('q');
+        return next;
+      },
+      { replace: true },
+    );
+  };
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return properties;
+    const q = query.toLowerCase();
+    return properties.filter((p) => p.address.toLowerCase().includes(q));
+  }, [properties, query]);
 
   const openForm = () => setShowForm(true);
   const closeForm = () => {
@@ -62,18 +83,45 @@ export const PropertiesPage = () => {
             <PropertyCardSkeleton key={i} />
           ))}
         </div>
-      ) : properties.length === 0 ? (
-        <EmptyState title="No properties yet" description="Add your first property to get started." />
       ) : (
         <>
-          <p className="text-sm text-stone-500 mb-4">
-            Showing {properties.length} of {properties.length} properties
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} onDelete={deleteProperty} />
-            ))}
-          </div>
+          {properties.length > 0 && (
+            <div className="mb-4">
+              <SearchBar value={query} onChange={setQuery} placeholder="Search by address…" />
+            </div>
+          )}
+
+          {filtered.length === 0 && properties.length > 0 ? (
+            <EmptyState
+              title={`No results for "${query}"`}
+              description="Try a different search term."
+              action={
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="text-sm text-orange-700 hover:underline"
+                >
+                  Clear search
+                </button>
+              }
+            />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="No properties yet"
+              description="Add your first property to get started."
+            />
+          ) : (
+            <>
+              <p className="text-sm text-stone-500 mb-4">
+                Showing {filtered.length} of {properties.length} properties
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filtered.map((property) => (
+                  <PropertyCard key={property.id} property={property} onDelete={deleteProperty} />
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

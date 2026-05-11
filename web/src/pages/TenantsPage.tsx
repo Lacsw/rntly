@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Plus, UserPlus } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import {
   useTenants,
   useTenantStats,
@@ -15,6 +16,7 @@ import {
   PageHeader,
   ErrorBanner,
   EmptyState,
+  SearchBar,
 } from '@/shared/components';
 
 const SKELETON_COUNT = 6;
@@ -25,6 +27,21 @@ export const TenantsPage = () => {
   const { properties, loading: propsLoading, error: propsError } = useProperties();
   const stats = useTenantStats(tenants, leases);
   const [showForm, setShowForm] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const query = searchParams.get('q') ?? '';
+
+  const setQuery = (value: string) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value) next.set('q', value);
+        else next.delete('q');
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   const propertyById = useMemo(() => {
     const map = new Map<string, (typeof properties)[number]>();
@@ -43,6 +60,16 @@ export const TenantsPage = () => {
     }
     return map;
   }, [leases]);
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return tenants;
+    const q = query.toLowerCase();
+    return tenants.filter(
+      (t) =>
+        `${t.first_name} ${t.last_name}`.toLowerCase().includes(q) ||
+        t.email.toLowerCase().includes(q),
+    );
+  }, [tenants, query]);
 
   const loading = tenantsLoading || leasesLoading || propsLoading;
 
@@ -84,28 +111,59 @@ export const TenantsPage = () => {
             <TenantCardSkeleton key={i} />
           ))}
         </div>
-      ) : tenants.length === 0 ? (
-        <EmptyState
-          title="No tenants yet"
-          description="Add your first tenant to get started."
-        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {tenants.map((tenant) => {
-            const lease = activeLeaseByTenant.get(tenant.id);
-            const property = lease ? propertyById.get(lease.property_id) : undefined;
-            return (
-              <TenantCard
-                key={tenant.id}
-                tenant={tenant}
-                lease={lease}
-                property={property}
-                leasesForStatus={leases}
-                paymentRate={lease ? 100 : undefined}
-              />
-            );
-          })}
-        </div>
+        <>
+          {tenants.length > 0 && (
+            <div className="mb-4">
+              <SearchBar value={query} onChange={setQuery} placeholder="Search by name or email…" />
+            </div>
+          )}
+
+          {filtered.length === 0 && tenants.length > 0 ? (
+            <EmptyState
+              title={`No results for "${query}"`}
+              description="Try a different search term."
+              action={
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="text-sm text-orange-700 hover:underline"
+                >
+                  Clear search
+                </button>
+              }
+            />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="No tenants yet"
+              description="Add your first tenant to get started."
+            />
+          ) : (
+            <>
+              {query && (
+                <p className="text-sm text-stone-500 mb-4">
+                  Showing {filtered.length} of {tenants.length} tenants
+                </p>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filtered.map((tenant) => {
+                  const lease = activeLeaseByTenant.get(tenant.id);
+                  const property = lease ? propertyById.get(lease.property_id) : undefined;
+                  return (
+                    <TenantCard
+                      key={tenant.id}
+                      tenant={tenant}
+                      lease={lease}
+                      property={property}
+                      leasesForStatus={leases}
+                      paymentRate={lease ? 100 : undefined}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </>
       )}
     </div>
   );

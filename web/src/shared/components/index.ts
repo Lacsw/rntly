@@ -11,3 +11,4 @@ export { FormField } from './ui/FormField';
 export { FormSelect } from './ui/FormSelect';
 export { Skeleton } from './ui/Skeleton';
 export { StatCardSkeleton } from './ui/StatCardSkeleton';
+export { SearchBar } from './ui/SearchBar';
