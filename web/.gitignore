@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Coverage
+coverage/
+
 # Playwright
 playwright-report/
 test-results/
