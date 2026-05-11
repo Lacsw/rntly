@@ -20,7 +20,7 @@ export const CreateTenantForm = ({ onSubmit, onCancel }: TCreateTenantFormProps)
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <FormField
           label="First Name"
