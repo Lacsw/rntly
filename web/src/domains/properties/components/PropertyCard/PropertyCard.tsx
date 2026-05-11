@@ -80,7 +80,7 @@ export const PropertyCard = ({ property, onDelete }: TPropertyCardProps) => {
       )}
 
       <Link to={`/properties/${property.id}`} className="block">
-        <PropertyCardImage property={property} />
+        <PropertyCardImage property={property} hasActions={!!onDelete} />
 
         <div className="p-4">
           <h3 className="text-lg font-semibold text-stone-900 flex items-center gap-1">

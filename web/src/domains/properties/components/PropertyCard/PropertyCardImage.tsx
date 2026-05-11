@@ -4,9 +4,10 @@ import { BuildingIcon } from '@/shared/icons/BuildingIcon';
 
 type PropertyCardImageProps = {
   property: TProperty;
+  hasActions?: boolean;
 };
 
-export const PropertyCardImage = ({ property }: PropertyCardImageProps) => {
+export const PropertyCardImage = ({ property, hasActions }: PropertyCardImageProps) => {
   return (
     <div className="relative aspect-16/10 bg-stone-200">
       {property.image_url ? (
@@ -28,7 +29,7 @@ export const PropertyCardImage = ({ property }: PropertyCardImageProps) => {
         />
       </div>
 
-      <div className="absolute top-3 right-3 flex items-center gap-2">
+      <div className={`absolute top-3 flex items-center gap-2 ${hasActions ? 'right-10' : 'right-3'}`}>
         <span className="bg-white/80 backdrop-blur text-stone-700 text-xs rounded-full px-3 py-1 capitalize">
           {property.type}
         </span>
