@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import {
   useProperties,
@@ -18,7 +19,15 @@ const SKELETON_COUNT = 6;
 
 export const PropertiesPage = () => {
   const { properties, loading, error, createProperty, deleteProperty } = useProperties();
-  const [showForm, setShowForm] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(() => searchParams.get('create') === '1');
+
+  const openForm = () => setShowForm(true);
+  const closeForm = () => {
+    setShowForm(false);
+    if (searchParams.get('create') === '1') navigate('/properties', { replace: true });
+  };
 
   return (
     <div>
@@ -27,7 +36,7 @@ export const PropertiesPage = () => {
         actions={
           <button
             type="button"
-            onClick={() => setShowForm(true)}
+            onClick={openForm}
             className="bg-orange-700 text-white px-4 py-2 rounded hover:bg-orange-800 flex items-center gap-2"
           >
             <Plus size={18} aria-hidden />
@@ -40,11 +49,11 @@ export const PropertiesPage = () => {
 
       <Modal
         open={showForm}
-        onClose={() => setShowForm(false)}
+        onClose={closeForm}
         title="Add New Property"
         icon={<BuildingIcon className="w-6 h-6 text-stone-700" />}
       >
-        <CreatePropertyForm onSubmit={createProperty} onCancel={() => setShowForm(false)} />
+        <CreatePropertyForm onSubmit={createProperty} onCancel={closeForm} />
       </Modal>
 
       {loading ? (

@@ -29,7 +29,7 @@ export const DashboardPage = () => {
         subtitle="Welcome to rntly"
         actions={
           <Link
-            to="/properties"
+            to="/properties?create=1"
             className="bg-stone-900 text-white px-4 py-2 rounded hover:bg-stone-800 flex items-center gap-2"
           >
             <Plus size={18} aria-hidden />
