@@ -19,12 +19,13 @@ export const CreateLeaseForm = ({
   onSubmit,
   onCancel,
 }: TCreateLeaseFormProps) => {
-  const { formData, updateField, reset, isValid, errors } = useCreateLeaseForm();
+  const { formData, updateField, markSubmitted, reset, isValid, errors } = useCreateLeaseForm();
   const startId = useId();
   const endId = useId();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    markSubmitted();
     if (!isValid) return;
     await onSubmit(formData);
     reset();
@@ -127,8 +128,7 @@ export const CreateLeaseForm = ({
         </button>
         <button
           type="submit"
-          disabled={!isValid}
-          className="bg-stone-900 text-white rounded-lg py-3 hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-stone-900 text-white rounded-lg py-3 hover:bg-stone-800"
         >
           Create Lease
         </button>

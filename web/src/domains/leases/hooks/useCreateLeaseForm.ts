@@ -17,12 +17,18 @@ type TFormErrors = {
 
 export const useCreateLeaseForm = () => {
   const [formData, setFormData] = useState<TLeaseCreate>(INITIAL);
+  const [submitted, setSubmitted] = useState(false);
 
   const updateField = <K extends keyof TLeaseCreate>(key: K, value: TLeaseCreate[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const reset = () => setFormData(INITIAL);
+  const markSubmitted = () => setSubmitted(true);
+
+  const reset = () => {
+    setFormData(INITIAL);
+    setSubmitted(false);
+  };
 
   const errors: TFormErrors = {};
   const start = formData.start_date ? new Date(formData.start_date).getTime() : NaN;
@@ -30,8 +36,8 @@ export const useCreateLeaseForm = () => {
   if (!Number.isNaN(start) && !Number.isNaN(end) && end <= start) {
     errors.end_date = 'End date must be after start date';
   }
-  if (formData.rent_amount !== 0 && formData.rent_amount <= 0) {
-    errors.rent_amount = 'Rent must be greater than 0';
+  if (submitted || formData.rent_amount !== 0) {
+    if (formData.rent_amount <= 0) errors.rent_amount = 'Rent must be greater than 0';
   }
 
   const isValid =
@@ -44,5 +50,5 @@ export const useCreateLeaseForm = () => {
     !errors.end_date &&
     !errors.rent_amount;
 
-  return { formData, updateField, reset, isValid, errors };
+  return { formData, updateField, markSubmitted, reset, isValid, errors };
 };

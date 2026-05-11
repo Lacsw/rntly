@@ -61,6 +61,25 @@ describe('useCreateLeaseForm', () => {
     expect(result.current.isValid).toBe(false);
   });
 
+  it('shows rent error after markSubmitted with zero rent', () => {
+    const { result } = renderHook(() => useCreateLeaseForm());
+    act(() => result.current.markSubmitted());
+    expect(result.current.errors.rent_amount).toBe('Rent must be greater than 0');
+  });
+
+  it('does not show rent error before submit is attempted', () => {
+    const { result } = renderHook(() => useCreateLeaseForm());
+    expect(result.current.errors.rent_amount).toBeUndefined();
+  });
+
+  it('reset clears submitted state so errors hide again', () => {
+    const { result } = renderHook(() => useCreateLeaseForm());
+    act(() => result.current.markSubmitted());
+    expect(result.current.errors.rent_amount).toBeDefined();
+    act(() => result.current.reset());
+    expect(result.current.errors).toEqual({});
+  });
+
   it('isValid is false when deposit is negative', () => {
     const { result } = renderHook(() => useCreateLeaseForm());
     act(() => {
