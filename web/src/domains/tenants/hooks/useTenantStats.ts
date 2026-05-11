@@ -4,7 +4,7 @@ import type { TLease } from '@/domains/leases';
 import { isActiveTenant } from '../utils/tenant';
 
 type TTenantStats = {
-  activeTenants: number;
+  totalTenants: number;
   monthlyRevenue: number;
   onTimePayments: number;
   overduePayments: number;
@@ -28,7 +28,7 @@ export const useTenantStats = (
     }, 0);
 
     return {
-      activeTenants,
+      totalTenants: tenants.length,
       monthlyRevenue,
       onTimePayments: activeTenants,
       overduePayments: 0,

@@ -3,14 +3,14 @@ import { StatCard } from '@/shared/components';
 import { formatCurrency } from '@/shared/utils';
 
 type TTenantStatCardsProps = {
-  activeTenants: number;
+  totalTenants: number;
   monthlyRevenue: number;
   onTimePayments: number;
   overduePayments: number;
 };
 
 export const TenantStatCards = ({
-  activeTenants,
+  totalTenants,
   monthlyRevenue,
   onTimePayments,
   overduePayments,
@@ -18,8 +18,8 @@ export const TenantStatCards = ({
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <StatCard
-        label="Active Tenants"
-        value={activeTenants}
+        label="Total Tenants"
+        value={totalTenants}
         icon={<Users size={20} aria-hidden />}
       />
       <StatCard

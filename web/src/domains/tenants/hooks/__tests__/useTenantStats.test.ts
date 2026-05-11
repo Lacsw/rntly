@@ -32,7 +32,7 @@ describe('useTenantStats', () => {
   it('returns zero stats when there are no tenants and no leases', () => {
     const { result } = renderHook(() => useTenantStats([], [], now));
     expect(result.current).toEqual({
-      activeTenants: 0,
+      totalTenants: 0,
       monthlyRevenue: 0,
       onTimePayments: 0,
       overduePayments: 0,
@@ -44,10 +44,10 @@ describe('useTenantStats', () => {
     const leases = [mkLease('l1', 't1', 1850), mkLease('l2', 't2', 2800)];
     const { result } = renderHook(() => useTenantStats(tenants, leases, now));
     expect(result.current.monthlyRevenue).toBe(4650);
-    expect(result.current.activeTenants).toBe(2);
+    expect(result.current.totalTenants).toBe(2);
   });
 
-  it('excludes leases that have ended from revenue and active count', () => {
+  it('excludes leases that have ended from revenue and on-time count', () => {
     const tenants = [mkTenant('t1'), mkTenant('t2')];
     const leases = [
       mkLease('l1', 't1', 1850),
@@ -55,10 +55,11 @@ describe('useTenantStats', () => {
     ];
     const { result } = renderHook(() => useTenantStats(tenants, leases, now));
     expect(result.current.monthlyRevenue).toBe(1850);
-    expect(result.current.activeTenants).toBe(1);
+    expect(result.current.totalTenants).toBe(2);
+    expect(result.current.onTimePayments).toBe(1);
   });
 
-  it('excludes leases that have not yet started from revenue and active count', () => {
+  it('excludes leases that have not yet started from revenue and on-time count', () => {
     const tenants = [mkTenant('t1'), mkTenant('t2')];
     const leases = [
       mkLease('l1', 't1', 1850),
@@ -66,21 +67,22 @@ describe('useTenantStats', () => {
     ];
     const { result } = renderHook(() => useTenantStats(tenants, leases, now));
     expect(result.current.monthlyRevenue).toBe(1850);
-    expect(result.current.activeTenants).toBe(1);
+    expect(result.current.totalTenants).toBe(2);
+    expect(result.current.onTimePayments).toBe(1);
   });
 
   it('defaults leases to empty array so no-arg callers still work', () => {
     const tenants = [mkTenant('t1')];
     const { result } = renderHook(() => useTenantStats(tenants));
-    expect(result.current.activeTenants).toBe(0);
+    expect(result.current.totalTenants).toBe(1);
     expect(result.current.monthlyRevenue).toBe(0);
   });
 
-  it('onTimePayments equals activeTenants as Sprint 1 placeholder', () => {
+  it('onTimePayments equals tenants with currently active leases', () => {
     const tenants = [mkTenant('t1'), mkTenant('t2')];
     const leases = [mkLease('l1', 't1', 1000), mkLease('l2', 't2', 1000)];
     const { result } = renderHook(() => useTenantStats(tenants, leases, now));
-    expect(result.current.onTimePayments).toBe(result.current.activeTenants);
+    expect(result.current.onTimePayments).toBe(2);
   });
 
   it('overduePayments is 0 as Sprint 1 placeholder', () => {
