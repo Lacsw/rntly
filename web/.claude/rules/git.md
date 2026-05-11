@@ -59,3 +59,4 @@ These require explicit user request:
 - Create empty commits
 - Push directly to `main`
 - Add `Co-Authored-By` or any AI attribution trailers
+- Reference bug IDs (`BUG-001`), sprint numbers (`Sprint 9`), or tracker tickets in commit messages or code — describe the problem and fix directly instead
