@@ -26,7 +26,7 @@ export const OverviewTab = ({ property }: TOverviewTabProps) => {
       <div className="bg-white rounded-xl border border-stone-100 p-6">
         <h3 className="font-semibold text-stone-900 mb-4">Property Details</h3>
         <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-          <DetailRow label="Type" value={property.type} />
+          <DetailRow label="Type" value={property.type.charAt(0).toUpperCase() + property.type.slice(1)} />
           <DetailRow label="Square Footage" value={extras.square_feet !== undefined ? `${extras.square_feet} sq ft` : '—'} />
           <DetailRow label="Year Built" value={extras.year_built ?? '—'} />
           <DetailRow label="Status" value={property.status} />
